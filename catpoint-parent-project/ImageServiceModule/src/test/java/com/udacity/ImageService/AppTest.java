@@ -1,4 +1,4 @@
-package com.udacity.catpoint;
+package com.udacity.ImageService;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
