@@ -1,5 +1,6 @@
 package com.udacity.ImageService.service;
 
+import com.udacity.ImageService.application.ImageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
  *      aws.secret=[your Secret access key]
  *      aws.region=[an aws region of choice. For example: us-east-2]
  */
-public class AwsImageService {
+public class AwsImageService implements ImageService {
 
     private Logger log = LoggerFactory.getLogger(AwsImageService.class);
 
@@ -66,6 +67,7 @@ public class AwsImageService {
      * @param confidenceThreshhold Minimum threshhold to consider for cat. For example, 90.0f would require 90% confidence minimum
      * @return
      */
+    @Override
     public boolean imageContainsCat(BufferedImage image, float confidenceThreshhold) {
         Image awsImage = null;
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {

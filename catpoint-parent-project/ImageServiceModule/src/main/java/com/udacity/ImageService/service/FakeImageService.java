@@ -1,14 +1,21 @@
 package com.udacity.ImageService.service;
 
+import com.udacity.ImageService.application.ImageService;
+
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
 /**
  * Service that tries to guess if an image displays a cat.
  */
-public class FakeImageService {
-    private final Random r = new Random();
+public class FakeImageService implements ImageService {
+    private final Random r;
 
+    public FakeImageService(){
+        this.r = new Random();
+    }
+
+    @Override
     public boolean imageContainsCat(BufferedImage image, float confidenceThreshhold) {
         return r.nextBoolean();
     }
