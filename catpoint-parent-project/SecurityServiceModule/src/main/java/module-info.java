@@ -8,6 +8,7 @@ module com.udacity.SecurityService {
     requires miglayout.core;
     exports com.udacity.SecurityService.service;
     exports com.udacity.SecurityService.application;
-    exports com.udacity.SecurityService.data;
+    //exports com.udacity.SecurityService.data;
+    opens com.udacity.SecurityService.data;
 
 }

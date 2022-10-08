@@ -1,6 +1,6 @@
 module com.udacity.ImageService {
     requires java.desktop;
-    requires miglayout.swing;
+
     requires org.slf4j;
     requires software.amazon.awssdk.services.rekognition;
     requires software.amazon.awssdk.auth;

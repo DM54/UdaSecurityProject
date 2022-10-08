@@ -1,3 +1,4 @@
+com\udacity\ImageService\application\ImageService.class
 com\udacity\ImageService\service\AwsImageService.class
 module-info.class
 com\udacity\ImageService\service\FakeImageService.class
