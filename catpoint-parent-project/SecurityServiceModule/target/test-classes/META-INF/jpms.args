@@ -1,0 +1,4 @@
+--patch-module
+com.udacity.SecurityService=_
+--add-reads
+com.udacity.SecurityService=ALL-UNNAMED
