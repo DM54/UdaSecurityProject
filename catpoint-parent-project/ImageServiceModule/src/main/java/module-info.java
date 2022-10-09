@@ -7,6 +7,7 @@ module com.udacity.ImageService {
     requires software.amazon.awssdk.core;
     requires software.amazon.awssdk.regions;
     exports com.udacity.ImageService.service;
+    exports com.udacity.ImageService.application;
 
 
 }
