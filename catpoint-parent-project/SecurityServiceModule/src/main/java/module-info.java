@@ -4,6 +4,7 @@ module com.udacity.SecurityService {
     requires guava;
     requires com.google.gson;
     requires java.prefs;
+    requires org.mockito.junit.jupiter;
     requires com.udacity.ImageService;
     requires miglayout.core;
     exports com.udacity.SecurityService.service;
