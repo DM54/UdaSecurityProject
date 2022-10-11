@@ -1,11 +1,8 @@
 package com.udacity.SecurityService.service;
 
-
-import com.udacity.ImageService.application.ImageService;
 import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.data.*;
-import com.udacity.SecurityService.service.SecurityService;
-import org.junit.jupiter.api.Assertions;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +12,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.awt.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -77,6 +71,24 @@ public class SecurityServiceTest {
 
     @Test
     public void IfAlarm_active_change_sensorState_shouldNotAffect_AlarmState(){
+        when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.ALARM);
+        securityService.changeSensorActivationStatus(sensor,sensor.getActive());
+        assertEquals(AlarmStatus.ALARM, securityService.getAlarmStatus());
+
+    }
+
+    @Test
+    public void IfSensorActivated_whileAlreadyActive_theSystemPending_changeTo_AlarmState(){
+        if(sensor.getActive()){
+            if(securityService.getAlarmStatus().equals(AlarmStatus.PENDING_ALARM)){
+                securityService.setAlarmStatus(AlarmStatus.ALARM);
+
+                when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.ALARM);
+                assertEquals(AlarmStatus.ALARM,securityService.getAlarmStatus());
+            }
+        }
+
+
 
     }
 
