@@ -130,9 +130,11 @@ public class SecurityServiceTest {
             securityService.setAlarmStatus(alarmStatus.ALARM);
             assertEquals(armingStatus.ARMED_HOME, securityService.getArmingStatus());
         }else {
+            Whitebox.invokeMethod(securityService, "catDetected", false);
+            when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
             securityService.setAlarmStatus(alarmStatus.NO_ALARM);
+            assertEquals(AlarmStatus.NO_ALARM, securityService.getAlarmStatus());
         }
-
 
 
     }
