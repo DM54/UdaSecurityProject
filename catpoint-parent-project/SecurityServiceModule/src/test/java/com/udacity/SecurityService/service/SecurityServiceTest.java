@@ -3,26 +3,20 @@ package com.udacity.SecurityService.service;
 import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.data.*;
 
-import javassist.bytecode.analysis.Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import static com.udacity.SecurityService.data.AlarmStatus.PENDING_ALARM;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+
 import static org.mockito.Mockito.*;
 
+
 @ExtendWith(MockitoExtension.class)
-@RunWith(PowerMockRunner.class)
 public class SecurityServiceTest {
 
     private SecurityService securityService;
@@ -32,8 +26,9 @@ public class SecurityServiceTest {
     private Sensor sensor;
     @Mock
     private FakeImageService imageService;
+
     @BeforeEach
-    public void init(){
+    public void init() {
         securityService = new SecurityService(securityRepository,imageService);
     }
 
@@ -41,9 +36,9 @@ public class SecurityServiceTest {
     public void If_alarm_isArmed_andSensor_becomesActivated_put_theSystem_intoPendingAlarmStatus(){
          when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
          securityService.changeSensorActivationStatus(sensor,sensor.getActive());
-       when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.PENDING_ALARM);
+       when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
        assertEquals(ArmingStatus.ARMED_HOME,securityService.getArmingStatus());
-       assertEquals(AlarmStatus.PENDING_ALARM, securityService.getAlarmStatus());
+       assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
      // verify(securityService).getArmingStatus();
       //verify(securityService).changeSensorActivationStatus(sensor,sensor.getActive());
       //verify(securityRepository).getAlarmStatus();
@@ -85,17 +80,16 @@ public class SecurityServiceTest {
 
     @Test
     public void IfSensorActivated_whileAlreadyActive_theSystemPending_changeTo_AlarmState() throws Exception{
-        if(sensor.getActive()){
-            if(securityService.getAlarmStatus().equals(AlarmStatus.PENDING_ALARM)){
-                securityService.setAlarmStatus(AlarmStatus.ALARM);
+        when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
+      //if(!sensor.getActive()){
+    Whitebox.invokeMethod
+                (securityService,"handleSensorActivated");
+           if(securityService.getAlarmStatus().equals(AlarmStatus.PENDING_ALARM)){
+               securityService.setAlarmStatus(AlarmStatus.ALARM);
 
-                when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.ALARM);
-                assertEquals(AlarmStatus.ALARM,securityService.getAlarmStatus());
-            }
-        }
-
-        Whitebox.invokeMethod(new Util(), "handleSensorActivated");
-
+                assertEquals(AlarmStatus.PENDING_ALARM, securityService.getAlarmStatus());
+           }
+       // }
 
 
     }
