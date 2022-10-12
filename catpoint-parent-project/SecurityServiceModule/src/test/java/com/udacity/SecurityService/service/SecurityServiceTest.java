@@ -6,11 +6,16 @@ import com.udacity.SecurityService.data.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 
-import static com.udacity.SecurityService.data.AlarmStatus.PENDING_ALARM;
+import java.awt.image.BufferedImage;
+
+import static com.udacity.SecurityService.data.AlarmStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
@@ -26,6 +31,10 @@ public class SecurityServiceTest {
     private Sensor sensor;
     @Mock
     private FakeImageService imageService;
+    @Mock
+    AlarmStatus alarmStatus;
+    @Mock
+    ArmingStatus armingStatus;
 
     @BeforeEach
     public void init() {
@@ -34,10 +43,11 @@ public class SecurityServiceTest {
 
     @Test
     public void If_alarm_isArmed_andSensor_becomesActivated_put_theSystem_intoPendingAlarmStatus(){
-         when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
+
+         when(securityService.getArmingStatus()).thenReturn(armingStatus.ARMED_HOME);
          securityService.changeSensorActivationStatus(sensor,sensor.getActive());
        when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
-       assertEquals(ArmingStatus.ARMED_HOME,securityService.getArmingStatus());
+       assertEquals(armingStatus.ARMED_HOME,securityService.getArmingStatus());
        assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
      // verify(securityService).getArmingStatus();
       //verify(securityService).changeSensorActivationStatus(sensor,sensor.getActive());
@@ -51,9 +61,9 @@ public class SecurityServiceTest {
        // securityService.changeSensorActivationStatus(sensor,sensor.getActive());
        // when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.PENDING_ALARM);
         securityService.addSensor(sensor);
-        securityService.setAlarmStatus(AlarmStatus.ALARM);
-        when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.ALARM);
-        assertEquals(AlarmStatus.ALARM, securityService.getAlarmStatus());
+        securityService.setAlarmStatus(ALARM);
+        when(securityService.getAlarmStatus()).thenReturn(ALARM);
+        assertEquals(ALARM, securityService.getAlarmStatus());
     }
 
     @Test
@@ -61,20 +71,20 @@ public class SecurityServiceTest {
         //when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.PENDING_ALARM);
         securityService.changeSensorActivationStatus(sensor, false);
         when(sensor.getActive()).thenReturn(false);
-        securityService.setAlarmStatus(AlarmStatus.NO_ALARM);
-        when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
+        securityService.setAlarmStatus(NO_ALARM);
+        when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
         assertAll(
                 //()-> assertEquals(AlarmStatus.PENDING_ALARM, securityService.getAlarmStatus()),
                 ()-> assertEquals(false, sensor.getActive()),
-                ()-> assertEquals(AlarmStatus.NO_ALARM, securityService.getAlarmStatus())
+                ()-> assertEquals(NO_ALARM, securityService.getAlarmStatus())
         );
     }
 
     @Test
     public void IfAlarm_active_change_sensorState_shouldNotAffect_AlarmState(){
-        when(securityService.getAlarmStatus()).thenReturn(AlarmStatus.ALARM);
+        when(securityService.getAlarmStatus()).thenReturn(ALARM);
         securityService.changeSensorActivationStatus(sensor,sensor.getActive());
-        assertEquals(AlarmStatus.ALARM, securityService.getAlarmStatus());
+        assertEquals(ALARM, securityService.getAlarmStatus());
 
     }
 
@@ -84,10 +94,10 @@ public class SecurityServiceTest {
       //if(!sensor.getActive()){
     Whitebox.invokeMethod
                 (securityService,"handleSensorActivated");
-           if(securityService.getAlarmStatus().equals(AlarmStatus.PENDING_ALARM)){
-               securityService.setAlarmStatus(AlarmStatus.ALARM);
+           if(securityService.getAlarmStatus().equals(alarmStatus.PENDING_ALARM)){
+               securityService.setAlarmStatus(ALARM);
 
-                assertEquals(AlarmStatus.PENDING_ALARM, securityService.getAlarmStatus());
+                assertEquals(alarmStatus.PENDING_ALARM, securityService.getAlarmStatus());
            }
        // }
 
@@ -95,12 +105,45 @@ public class SecurityServiceTest {
     }
 
     @Test
+    public void IfSensor_deactivated_alreadyInactive_makeNoChanges_toTheAlarmState() throws Exception {
+
+       when(securityService.getAlarmStatus()).thenReturn(alarmStatus.PENDING_ALARM);
+        Whitebox.invokeMethod
+                (securityService,"handleSensorDeactivated");
+        if(sensor.getActive().equals(false)){
+            securityService.changeSensorActivationStatus(sensor,false);
+            assertEquals(alarmStatus.PENDING_ALARM, securityService.getAlarmStatus());
+        }
+        else {
+            assertEquals(alarmStatus.ALARM, securityService.getAlarmStatus());
+        }
+    }
+
+    @Test
+    public void IfImageService_identifiesImageContaining_ACat_systemArmedHome_putSystem_intoAlarmStatus() throws Exception {
+        BufferedImage bufferedImage = new BufferedImage(200,200,BufferedImage.TYPE_INT_RGB);
+        when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
+        securityService.processImage(bufferedImage);
+        Whitebox.invokeMethod(securityService, "catDetected", true);
+        when(securityService.getArmingStatus()).thenReturn(armingStatus.ARMED_HOME);
+        if(securityService.getArmingStatus()==armingStatus.ARMED_HOME) {
+            securityService.setAlarmStatus(alarmStatus.ALARM);
+            assertEquals(armingStatus.ARMED_HOME, securityService.getArmingStatus());
+        }else {
+            securityService.setAlarmStatus(alarmStatus.NO_ALARM);
+        }
+
+
+
+    }
+
+    @Test
 
     public void if_theSystem_isArmed_resetALL_theSensors_toInactive(){
-        when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
+        when(securityService.getArmingStatus()).thenReturn(armingStatus.ARMED_AWAY);
         //securityService.changeSensorActivationStatus(sensor,sensor.getActive());
         securityService.removeSensor(sensor);
-        assertEquals(ArmingStatus.ARMED_AWAY, securityService.getArmingStatus());
+        assertEquals(armingStatus.ARMED_AWAY, securityService.getArmingStatus());
         assertEquals(false,sensor.getActive());
     }
 
