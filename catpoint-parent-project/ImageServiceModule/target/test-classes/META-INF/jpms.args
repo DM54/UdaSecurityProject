@@ -1,4 +1,0 @@
---patch-module
-com.udacity.ImageService=_
---add-reads
-com.udacity.ImageService=ALL-UNNAMED
