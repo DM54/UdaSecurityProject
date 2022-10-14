@@ -4,15 +4,17 @@ import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.data.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.*;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.powermock.reflect.Whitebox;
 
 import java.awt.image.BufferedImage;
+
 
 import static com.udacity.SecurityService.data.AlarmStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,10 +42,11 @@ public class SecurityServiceTest {
     public void If_alarm_isArmed_andSensor_becomesActivated_put_theSystem_intoPendingAlarmStatus() throws Exception {
 
         when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
-        if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_AWAY) && sensor.getActive().equals(true)) {
+        when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
+        if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
             securityService.changeSensorActivationStatus(sensor, true);
-            Whitebox.invokeMethod(securityService, " handleSensorActivated");
-            when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
+            Whitebox.invokeMethod(securityService,  "handleSensorActivated");
+
             if (securityService.getAlarmStatus().equals(NO_ALARM)) {
                 securityService.setAlarmStatus(PENDING_ALARM);
                 assertEquals(ArmingStatus.ARMED_AWAY, securityService.getArmingStatus());
@@ -51,21 +54,17 @@ public class SecurityServiceTest {
             }
         }
 
-        // verify(securityService).getArmingStatus();
-        //verify(securityService).changeSensorActivationStatus(sensor,sensor.getActive());
-        //verify(securityRepository).getAlarmStatus();
-
     }
 
     @Test
     public void If_alarm_isArmed_andSensor_becomesActivated_andSystem_isAlready_pendingAlarm_setAlarmStatus_toAlarm() throws Exception {
 
         when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
-        if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_AWAY) && sensor.getActive().equals(true)
-                && securityService.getAlarmStatus().equals(PENDING_ALARM)) {
+        when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
+        if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
             securityService.changeSensorActivationStatus(sensor, true);
-            Whitebox.invokeMethod(securityService, " handleSensorActivated");
-            when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
+            Whitebox.invokeMethod(securityService, "handleSensorActivated");
+
             if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
                 securityService.setAlarmStatus(ALARM);
                 assertEquals(ArmingStatus.ARMED_AWAY, securityService.getArmingStatus());
@@ -77,17 +76,20 @@ public class SecurityServiceTest {
     @Test
     public void ifPending_Alarm_andAllSensors_inactive_returnTo_noAlarmState() throws Exception {
 
-        securityService.changeSensorActivationStatus(sensor, false);
         for (Sensor s : securityService.getSensors()
         ) {
-            when(s.getActive()).thenReturn(true);
-
-            Whitebox.invokeMethod(securityService, "handleSensorDeactivated");
+            when(s.getActive()).thenReturn(false);
             when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
-            if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
-                securityService.setAlarmStatus(NO_ALARM);
-                assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
-            }
+
+            securityService.changeSensorActivationStatus(sensor,false);
+            Whitebox.invokeMethod(securityService, "handleSensorDeactivated");
+
+            if(sensor.getActive().equals(false)) {
+               if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
+                    securityService.setAlarmStatus(NO_ALARM);
+               }
+        assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
+         }
         }
 
     }
@@ -103,7 +105,6 @@ public class SecurityServiceTest {
 
     @Test
     public void IfSensorActivated_whileAlreadyActive_theSystemPending_changeTo_AlarmState() throws Exception {
-        // when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
 
         if (sensor.getActive().equals(true)) {
             securityService.changeSensorActivationStatus(sensor, true);
@@ -111,15 +112,17 @@ public class SecurityServiceTest {
                     (securityService, "handleSensorActivated");
 
             if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
-
+                when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
                 securityService.setAlarmStatus(ALARM);
-                assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
-            } /*else if (securityService.getAlarmStatus().equals(NO_ALARM)) {
-               when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
-               securityService.setAlarmStatus(PENDING_ALARM);
-               assertTrue(Whitebox.invokeMethod
-                       (securityService,"handleSensorActivated").equals(NO_ALARM));
-           }*/
+
+            }
+            assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
+            if (securityService.getAlarmStatus().equals(NO_ALARM)) {
+                when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
+                securityService.setAlarmStatus(PENDING_ALARM);
+
+            }
+            assertEquals(NO_ALARM,securityService.getAlarmStatus());
         }
 
     }
@@ -165,54 +168,16 @@ public class SecurityServiceTest {
             securityService.setAlarmStatus(NO_ALARM);
             assertEquals(AlarmStatus.NO_ALARM, securityService.getAlarmStatus());
         }
-    }
 
-   /* @Test
-    public void IfSystemDisarmed_setStatusNoAlarm() {
-        when(securityService.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
-        if (securityService.getArmingStatus().equals(ArmingStatus.DISARMED)) {
-            when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
-            securityService.setAlarmStatus(NO_ALARM);
-        }
-        assertEquals(NO_ALARM, securityService.getAlarmStatus());
-    }
-
-    @Test
-    public void IfSystemArmedHome_whileCameraShowsCat_setAlarmStatusToAlarm() throws Exception {
-        when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
-        if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
-            Whitebox.invokeMethod(securityService, "catDetected", true);
-            when(securityService.getAlarmStatus()).thenReturn(ALARM);
-            securityService.setAlarmStatus(ALARM);
-        }
-        assertEquals(ALARM, securityService.getAlarmStatus());
-
+        verify(imageService).imageContainsCat(bufferedImage,50.0f);
     }
 
 
-    @Test
-
-    public void if_theSystem_isArmed_resetALL_theSensors_toInactive() {
-        when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
-        //securityService.changeSensorActivationStatus(sensor,sensor.getActive());
-        if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
-            for (Sensor s : securityService.getSensors()
-            ) {
-                when(s.getActive()).thenReturn(false);
-
-                //securityService.removeSensor(sensor);
-                //assertEquals(armingStatus.ARMED_AWAY, securityService.getArmingStatus());
-                assertEquals(false, s.getActive());
-            }
-        }
-    }*/
-    enum ArmingStatus1{
-        ARMED_AWAY, ARMED_HOME, DISARMED
-   }
     @ParameterizedTest
-    @EnumSource(ArmingStatus1.class)
-    public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach() throws Exception {
-
+    @DisplayName("ARMED_AWAYOrARMED_HOMEOrDISARMED")
+    @ValueSource(strings = {"ARMED_AWAY", "ARMED_HOME", "DISARMED"})
+    public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach(String args) throws Exception {
+             assertNotNull(args);
         when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
         //securityService.changeSensorActivationStatus(sensor,sensor.getActive());
         if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
@@ -240,7 +205,9 @@ public class SecurityServiceTest {
         }
         assertEquals(NO_ALARM, securityService.getAlarmStatus());
 
+
     }
+
 
 }
 
