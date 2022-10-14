@@ -75,22 +75,16 @@ public class SecurityServiceTest {
 
     @Test
     public void ifPending_Alarm_andAllSensors_inactive_returnTo_noAlarmState() throws Exception {
+             when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
+            if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
 
-        for (Sensor s : securityService.getSensors()
-        ) {
-            when(s.getActive()).thenReturn(false);
-            when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
+                securityService.changeSensorActivationStatus(sensor, false);
+               // when(s.getActive()).thenReturn(false);
+               Whitebox.invokeMethod
+                        (securityService, "handleSensorDeactivated");
+                    assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
 
-            securityService.changeSensorActivationStatus(sensor,false);
-            Whitebox.invokeMethod(securityService, "handleSensorDeactivated");
-
-            if(sensor.getActive().equals(false)) {
-               if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
-                    securityService.setAlarmStatus(NO_ALARM);
-               }
-        assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
-         }
-        }
+            }
 
     }
 
@@ -106,23 +100,15 @@ public class SecurityServiceTest {
     @Test
     public void IfSensorActivated_whileAlreadyActive_theSystemPending_changeTo_AlarmState() throws Exception {
 
-        if (sensor.getActive().equals(true)) {
+        when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
+        if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
+
             securityService.changeSensorActivationStatus(sensor, true);
+            // when(s.getActive()).thenReturn(false);
             Whitebox.invokeMethod
                     (securityService, "handleSensorActivated");
-
-            if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
-                when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
-                securityService.setAlarmStatus(ALARM);
-
-            }
             assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
-            if (securityService.getAlarmStatus().equals(NO_ALARM)) {
-                when(securityService.getAlarmStatus()).thenReturn(NO_ALARM);
-                securityService.setAlarmStatus(PENDING_ALARM);
 
-            }
-            assertEquals(NO_ALARM,securityService.getAlarmStatus());
         }
 
     }
@@ -130,15 +116,14 @@ public class SecurityServiceTest {
     @Test
     public void IfSensor_deactivated_alreadyInactive_makeNoChanges_toTheAlarmState() throws Exception {
         when(securityService.getAlarmStatus()).thenReturn(ALARM);
+        if (securityService.getAlarmStatus().equals(ALARM)) {
 
-        if (sensor.getActive().equals(false)) {
             securityService.changeSensorActivationStatus(sensor, false);
+            // when(s.getActive()).thenReturn(false);
             Whitebox.invokeMethod
                     (securityService, "handleSensorDeactivated");
-            //when(securityService.getAlarmStatus()).thenReturn(ALARM);
-            if (securityService.getAlarmStatus().equals(ALARM)) {
-                assertEquals(ALARM, securityService.getAlarmStatus());
-            }
+            assertEquals(ALARM, securityService.getAlarmStatus());
+
         }
 
     }
