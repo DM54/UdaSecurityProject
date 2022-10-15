@@ -177,7 +177,7 @@ public class SecurityServiceTest {
                 when(s.getActive()).thenReturn(false);
 
                 securityService.removeSensor(sensor);
-                //assertEquals(armingStatus.ARMED_AWAY, securityService.getArmingStatus());
+                assertEquals(ArmingStatus.ARMED_AWAY, securityService.getArmingStatus());
                 assertEquals(false, s.getActive());
             }
         }
