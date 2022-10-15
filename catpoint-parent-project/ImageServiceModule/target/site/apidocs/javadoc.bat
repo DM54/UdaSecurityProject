@@ -1,0 +1,1 @@
+cmd.exe /X /C "C:\Users\dyana\Desktop\OpenJDK18\jdk-18.0.1.1\bin\javadoc.exe @options @packages @argfile"

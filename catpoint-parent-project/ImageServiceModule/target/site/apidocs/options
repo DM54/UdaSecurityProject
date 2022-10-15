@@ -1,0 +1,28 @@
+--class-path
+'C:/Users/dyana/.m2/repository/software/amazon/awssdk/annotations/2.17.289/annotations-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/utils/2.17.289/utils-2.17.289.jar;C:/Users/dyana/.m2/repository/org/reactivestreams/reactive-streams/1.0.3/reactive-streams-1.0.3.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/profiles/2.17.289/profiles-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/http-client-spi/2.17.289/http-client-spi-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/json-utils/2.17.289/json-utils-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/third-party-jackson-core/2.17.289/third-party-jackson-core-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/eventstream/eventstream/1.0.1/eventstream-1.0.1.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/aws-json-protocol/2.17.289/aws-json-protocol-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/protocol-core/2.17.289/protocol-core-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/aws-core/2.17.289/aws-core-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/metrics-spi/2.17.289/metrics-spi-2.17.289.jar'
+--module-path
+'C:/Users/dyana/.m2/repository/software/amazon/awssdk/sdk-core/2.17.289/sdk-core-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/auth/2.17.289/auth-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/regions/2.17.289/regions-2.17.289.jar;C:/Users/dyana/.m2/repository/software/amazon/awssdk/rekognition/2.17.289/rekognition-2.17.289.jar;C:/Users/dyana/.m2/repository/org/slf4j/slf4j-api/2.0.3/slf4j-api-2.0.3.jar'
+--patch-module
+com.udacity.ImageService='C:/Users/dyana/IdeaProjects/UdaSecurityProject/UdaSecurityProject/catpoint-parent-project/ImageServiceModule/src/main/java'
+-encoding
+'UTF-8'
+-protected
+--module-source-path
+'C:/Users/dyana/IdeaProjects/UdaSecurityProject/UdaSecurityProject/catpoint-parent-project/ImageServiceModule/target/site/apidocs/src'
+-author
+-bottom
+'Copyright &#169; 2022. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/Users/dyana/IdeaProjects/UdaSecurityProject/UdaSecurityProject/catpoint-parent-project/ImageServiceModule/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'ImageServiceModule 1.0-SNAPSHOT API'
+-linkoffline
+'https://docs.oracle.com/javase/9/docs/api' 'C:/Users/dyana/IdeaProjects/UdaSecurityProject/UdaSecurityProject/catpoint-parent-project/ImageServiceModule/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'ImageServiceModule 1.0-SNAPSHOT API'
