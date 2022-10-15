@@ -75,25 +75,31 @@ public class SecurityServiceTest {
 
     @Test
     public void ifPending_Alarm_andAllSensors_inactive_returnTo_noAlarmState() throws Exception {
-             when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
-            if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
 
+             when(securityService.getAlarmStatus()).thenReturn(PENDING_ALARM);
+
+            if (securityService.getAlarmStatus().equals(PENDING_ALARM)) {
                 securityService.changeSensorActivationStatus(sensor, false);
-               // when(s.getActive()).thenReturn(false);
-               Whitebox.invokeMethod
-                        (securityService, "handleSensorDeactivated");
+               // when(sensor.getActive()).thenReturn(true);
+                //sensor.setActive(false);
+                //when(sensor.getActive()).thenReturn(false);
+             // if (sensor.getActive().equals(false)) {
+                    Whitebox.invokeMethod
+                            (securityService, "handleSensorDeactivated");
                     assertEquals(PENDING_ALARM, securityService.getAlarmStatus());
 
-            }
-
+                }
+            //}
     }
 
 
     @Test
-    public void IfAlarm_active_change_sensorState_shouldNotAffect_AlarmState() {
+    public void IfAlarm_active_change_sensorState_shouldNotAffect_AlarmState() throws Exception {
         when(securityService.getAlarmStatus()).thenReturn(ALARM);
         securityService.changeSensorActivationStatus(sensor, true);
+        //Whitebox.invokeMethod(securityService,"handleSensorDeactivated");
         assertEquals(ALARM, securityService.getAlarmStatus());
+       // assertEquals(false,sensor.getActive());
 
     }
 
@@ -164,13 +170,13 @@ public class SecurityServiceTest {
     public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach(String args) throws Exception {
              assertNotNull(args);
         when(securityService.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
-        //securityService.changeSensorActivationStatus(sensor,sensor.getActive());
+
         if (securityService.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
             for (Sensor s : securityService.getSensors()
             ) {
                 when(s.getActive()).thenReturn(false);
 
-                //securityService.removeSensor(sensor);
+                securityService.removeSensor(sensor);
                 //assertEquals(armingStatus.ARMED_AWAY, securityService.getArmingStatus());
                 assertEquals(false, s.getActive());
             }
