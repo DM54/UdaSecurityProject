@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"com.udacity.ImageService","l":"com.udacity.ImageService.application"},{"m":"com.udacity.ImageService","l":"com.udacity.ImageService.service"}];updateSearchResults();

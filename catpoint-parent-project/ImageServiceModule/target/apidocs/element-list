@@ -1,0 +1,3 @@
+module:com.udacity.ImageService
+com.udacity.ImageService.application
+com.udacity.ImageService.service
