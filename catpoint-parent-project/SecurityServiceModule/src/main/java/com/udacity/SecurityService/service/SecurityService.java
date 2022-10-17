@@ -84,9 +84,13 @@ public class SecurityService {
             return; //no problem if the system is disarmed
         }
         switch(securityRepository.getAlarmStatus()) {
-            case NO_ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
+            case NO_ALARM ->
+                setAlarmStatus(AlarmStatus.PENDING_ALARM);
+
             case PENDING_ALARM -> setAlarmStatus(AlarmStatus.ALARM);
-        }
+
+            default -> System.out.println("this is the default from handleSensorActivated");
+        };
     }
 
     /**
@@ -96,7 +100,8 @@ public class SecurityService {
         switch(securityRepository.getAlarmStatus()) {
             case PENDING_ALARM -> setAlarmStatus(AlarmStatus.NO_ALARM);
             case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
-        }
+            default -> System.out.println("this is the default from handleSensorDeactivated");
+        };
     }
 
     /**

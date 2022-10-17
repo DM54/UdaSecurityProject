@@ -2,6 +2,7 @@ package com.udacity.SecurityService.data;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.lang.reflect.Type;
 import java.util.Set;
@@ -35,12 +36,23 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
         //we've serialized our sensor objects for storage, which should be a good warning sign that
         // this is likely an impractical solution for a real system
         String sensorString = prefs.get(SENSORS, null);
+       
         if(sensorString == null) {
             sensors = new TreeSet<>();
         } else {
-            Type type = new TypeToken<Set<Sensor>>() {
-            }.getType();
-            sensors = gson.fromJson(sensorString, type);
+
+
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            for (SensorType s: SensorType.values()
+                 ) {
+                gsonBuilder.registerTypeAdapter(Sensor.class, new NewSensorProvider(SENSORS, s));
+            }
+            Gson gson = gsonBuilder.create();
+
+            sensors = gson.fromJson(sensorString, new TypeToken<Set<Sensor>>() {
+            }.getType());
+
+
         }
     }
 
