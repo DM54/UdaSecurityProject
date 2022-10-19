@@ -3,12 +3,8 @@ package com.udacity.SecurityService.data;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
@@ -21,7 +17,7 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
     private Set<Sensor> sensors;
     private AlarmStatus alarmStatus;
     private ArmingStatus armingStatus;
-
+    private Sensor sensor;
     //preference keys
     private static final String SENSORS = "SENSORS";
     private static final String ALARM_STATUS = "ALARM_STATUS";
@@ -43,12 +39,14 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
             sensors = new TreeSet<>();
         } else {
 
-
             GsonBuilder gsonBuilder = new GsonBuilder();
-            for (SensorType s: SensorType.values()
-                 ) {
-                gsonBuilder.registerTypeAdapter(Sensor.class, new NewSensorProvider(SENSORS, s));
-            }
+            Map<String, SensorType> sensorTypeMap = new HashMap<>();
+            for (SensorType s : SensorType.values()) {
+                //sensorTypeMap.put(s.getName(), s.getSensorType());
+                gsonBuilder.registerTypeAdapter(Sensor.class,
+                        new NewSensorProvider(SENSORS, s));
+
+        }
             Gson gson = gsonBuilder.create();
 
             sensors = gson.fromJson(sensorString, new TypeToken<Set<Sensor>>() {

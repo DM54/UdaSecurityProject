@@ -7,9 +7,9 @@ import java.lang.reflect.Type;
 public class NewSensorProvider implements InstanceCreator<Sensor> {
     private String name;
     private SensorType sensorType;
-    public NewSensorProvider(String name, SensorType type){
+    public NewSensorProvider(String name, SensorType sensorType){
         this.name = name;
-        this.sensorType = type;
+        this.sensorType = sensorType;
     }
 
     @Override

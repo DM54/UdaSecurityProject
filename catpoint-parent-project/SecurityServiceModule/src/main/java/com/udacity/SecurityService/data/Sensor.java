@@ -2,7 +2,9 @@ package com.udacity.SecurityService.data;
 
 
 import com.google.common.collect.ComparisonChain;
+import com.google.gson.InstanceCreator;
 
+import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -76,3 +78,5 @@ public class Sensor implements Comparable<Sensor> {
                 .result();
     }
 }
+
+
