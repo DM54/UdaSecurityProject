@@ -1,7 +1,9 @@
 package com.udacity.SecurityService.application;
 
+import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.application.StatusListener;
 import com.udacity.SecurityService.data.AlarmStatus;
+import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
 import com.udacity.SecurityService.service.SecurityService;
 import com.udacity.ImageService.service.StyleService;
 import net.miginfocom.swing.MigLayout;
@@ -29,7 +31,7 @@ public class ImagePanel extends JPanel implements StatusListener {
     public ImagePanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
-        this.securityService = securityService;
+        this.securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
         securityService.addStatusListener(this);
 
         cameraHeader = new JLabel("Camera Feed");

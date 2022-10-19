@@ -1,6 +1,8 @@
 package com.udacity.SecurityService.application;
 
+import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.ImageService.service.StyleService;
+import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
 import com.udacity.SecurityService.data.SensorType;
 import com.udacity.SecurityService.data.Sensor;
 import com.udacity.SecurityService.service.SecurityService;
@@ -29,7 +31,7 @@ public class SensorPanel extends JPanel {
     public SensorPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
-        this.securityService = securityService;
+        this.securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
 
         panelLabel.setFont(StyleService.HEADING_FONT);
         addNewSensorButton.addActionListener(e ->

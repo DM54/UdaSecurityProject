@@ -1,6 +1,9 @@
 package com.udacity.SecurityService.application;
 
+import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.data.ArmingStatus;
+import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
+import com.udacity.SecurityService.data.SecurityRepository;
 import com.udacity.SecurityService.service.SecurityService;
 import com.udacity.ImageService.service.StyleService;
 import net.miginfocom.swing.MigLayout;
@@ -22,7 +25,7 @@ public class ControlPanel extends JPanel {
     public ControlPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
-        this.securityService = securityService;
+        this.securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
 
         JLabel panelLabel = new JLabel("System Control");
         panelLabel.setFont(StyleService.HEADING_FONT);
