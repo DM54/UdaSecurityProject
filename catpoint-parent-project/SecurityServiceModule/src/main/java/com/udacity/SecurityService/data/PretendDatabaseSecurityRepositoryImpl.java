@@ -3,7 +3,10 @@ package com.udacity.SecurityService.data;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.lang.reflect.Type;
+import com.udacity.ImageService.service.FakeImageService;
+import com.udacity.SecurityService.application.SensorPanel;
+import com.udacity.SecurityService.service.SecurityService;
+
 import java.util.*;
 import java.util.prefs.Preferences;
 
@@ -18,6 +21,7 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
     private AlarmStatus alarmStatus;
     private ArmingStatus armingStatus;
     private Sensor sensor;
+
     //preference keys
     private static final String SENSORS = "SENSORS";
     private static final String ALARM_STATUS = "ALARM_STATUS";
@@ -25,8 +29,9 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
 
     private static final Preferences prefs = Preferences.userNodeForPackage(PretendDatabaseSecurityRepositoryImpl.class);
     private static final Gson gson = new Gson(); //used to serialize objects into JSON
+    @SuppressWarnings("UnstableApiUsage")
+    public PretendDatabaseSecurityRepositoryImpl(){
 
-    public PretendDatabaseSecurityRepositoryImpl() {
         //load system state from prefs, or else default
         alarmStatus = AlarmStatus.valueOf(prefs.get(ALARM_STATUS, AlarmStatus.NO_ALARM.toString()));
         armingStatus = ArmingStatus.valueOf(prefs.get(ARMING_STATUS, ArmingStatus.DISARMED.toString()));
@@ -40,18 +45,14 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
         } else {
 
             GsonBuilder gsonBuilder = new GsonBuilder();
-            Map<String, SensorType> sensorTypeMap = new HashMap<>();
-            for (SensorType s : SensorType.values()) {
-                //sensorTypeMap.put(s.getName(), s.getSensorType());
-                gsonBuilder.registerTypeAdapter(Sensor.class,
-                        new NewSensorProvider(SENSORS, s));
 
-        }
-            Gson gson = gsonBuilder.create();
+               EnumSet.allOf(SensorType.class).forEach(sensorType -> gsonBuilder.registerTypeAdapter(Sensor.class,
+                       new NewSensorProvider(SENSORS,sensorType)));
 
-            sensors = gson.fromJson(sensorString, new TypeToken<Set<Sensor>>() {
-            }.getType());
+                Gson gson1 = gsonBuilder.create();
 
+                sensors = gson1.fromJson(sensorString, new TypeToken<Set<Sensor>>() {
+                }.getType());
 
         }
     }

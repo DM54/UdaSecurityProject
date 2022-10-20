@@ -4,6 +4,7 @@ import com.google.gson.InstanceCreator;
 
 import java.lang.reflect.Type;
 
+
 public class NewSensorProvider implements InstanceCreator<Sensor> {
     private String name;
     private SensorType sensorType;

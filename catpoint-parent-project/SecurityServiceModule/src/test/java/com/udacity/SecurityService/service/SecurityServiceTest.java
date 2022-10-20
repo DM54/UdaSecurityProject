@@ -40,34 +40,34 @@ public class SecurityServiceTest {
     }
 
     @Test
-    public void If_alarm_isArmed_andSensor_becomesActivated_put_theSystem_intoPendingAlarmStatus() throws Exception {
+   public void If_alarm_isArmed_andSensor_becomesActivated_put_theSystem_intoPendingAlarmStatus() throws Exception {
 
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
-        when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
-        if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
+
+        if (securityRepository.getArmingStatus().equals(securityService.getArmingStatus())) {
             securityService.changeSensorActivationStatus(sensor, true);
             Whitebox.invokeMethod(securityService,  "handleSensorActivated");
-
-            if (securityRepository.getAlarmStatus().equals(NO_ALARM)) {
-                securityRepository.setAlarmStatus(PENDING_ALARM);
-                assertEquals(ArmingStatus.ARMED_AWAY, securityRepository.getArmingStatus());
-                assertEquals(NO_ALARM, securityRepository.getAlarmStatus());
+            when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
+            if (securityRepository.getAlarmStatus().equals(securityService.getAlarmStatus())) {
+                securityService.setAlarmStatus(PENDING_ALARM);
+                assertEquals(ArmingStatus.ARMED_AWAY, securityService.getArmingStatus());
+                assertEquals(NO_ALARM, securityService.getAlarmStatus());
             }
         }
 
     }
 
-    @Test
+   @Test
     public void If_alarm_isArmed_andSensor_becomesActivated_andSystem_isAlready_pendingAlarm_setAlarmStatus_toAlarm() throws Exception {
 
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
-        when(securityRepository.getAlarmStatus()).thenReturn(PENDING_ALARM);
+
         if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
             securityService.changeSensorActivationStatus(sensor, true);
             Whitebox.invokeMethod(securityService, "handleSensorActivated");
-
+            when(securityRepository.getAlarmStatus()).thenReturn(PENDING_ALARM);
             if (securityRepository.getAlarmStatus().equals(PENDING_ALARM)) {
-                securityRepository.setAlarmStatus(ALARM);
+                securityService.setAlarmStatus(ALARM);
                 assertEquals(ArmingStatus.ARMED_AWAY, securityRepository.getArmingStatus());
                 assertEquals(PENDING_ALARM, securityRepository.getAlarmStatus());
             }
@@ -143,7 +143,7 @@ public class SecurityServiceTest {
         Whitebox.invokeMethod(securityService, "catDetected", true);
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
         if (securityRepository.getArmingStatus() == ArmingStatus.ARMED_HOME) {
-            securityRepository.setAlarmStatus(ALARM);
+            securityService.setAlarmStatus(ALARM);
             assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
         }
 
@@ -157,7 +157,7 @@ public class SecurityServiceTest {
         Whitebox.invokeMethod(securityService, "catDetected", false);
         if (sensor.getActive().equals(false)) {
             when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
-            securityRepository.setAlarmStatus(NO_ALARM);
+            securityService.setAlarmStatus(NO_ALARM);
             assertEquals(AlarmStatus.NO_ALARM, securityRepository.getAlarmStatus());
         }
 
@@ -186,14 +186,14 @@ public class SecurityServiceTest {
         if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
             Whitebox.invokeMethod(securityService, "catDetected", true);
             when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
-            securityRepository.setAlarmStatus(ALARM);
+            securityService.setAlarmStatus(ALARM);
         }
         assertEquals(ALARM, securityRepository.getAlarmStatus());
 
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
         if (securityRepository.getArmingStatus().equals(ArmingStatus.DISARMED)) {
             when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
-            securityRepository.setAlarmStatus(NO_ALARM);
+            securityService.setAlarmStatus(NO_ALARM);
         }
         assertEquals(NO_ALARM, securityRepository.getAlarmStatus());
 
