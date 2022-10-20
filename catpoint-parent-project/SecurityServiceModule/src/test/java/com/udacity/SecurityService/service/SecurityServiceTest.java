@@ -81,16 +81,18 @@ public class SecurityServiceTest {
 
             if (securityRepository.getAlarmStatus().equals(PENDING_ALARM)) {
                 securityService.changeSensorActivationStatus(sensor, false);
-               // when(sensor.getActive()).thenReturn(true);
-                //sensor.setActive(false);
-                //when(sensor.getActive()).thenReturn(false);
-             // if (sensor.getActive().equals(false)) {
+                when(sensor.getActive()).thenReturn(true);
+                sensor.setActive(false);
+                when(sensor.getActive()).thenReturn(false);
+             if (sensor.getActive().equals(false)) {
+
                     Whitebox.invokeMethod
                             (securityService, "handleSensorDeactivated");
+                 securityService.setAlarmStatus(NO_ALARM);
                     assertEquals(PENDING_ALARM, securityRepository.getAlarmStatus());
 
                 }
-            //}
+            }
     }
 
 
@@ -123,7 +125,7 @@ public class SecurityServiceTest {
     @Test
     public void IfSensor_deactivated_alreadyInactive_makeNoChanges_toTheAlarmState() throws Exception {
         when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
-        if (securityRepository.getAlarmStatus().equals(ALARM)) {
+        if (securityRepository.getAlarmStatus().equals(securityService.getAlarmStatus())) {
 
             securityService.changeSensorActivationStatus(sensor, false);
             // when(s.getActive()).thenReturn(false);
