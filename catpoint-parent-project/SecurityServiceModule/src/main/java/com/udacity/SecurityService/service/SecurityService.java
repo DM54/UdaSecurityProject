@@ -1,10 +1,15 @@
 package com.udacity.SecurityService.service;
 
 import com.udacity.ImageService.service.FakeImageService;
+import com.udacity.SecurityService.application.ImagePanel;
+import com.udacity.SecurityService.application.SensorPanel;
 import com.udacity.SecurityService.application.StatusListener;
 import com.udacity.SecurityService.data.*;
 
+import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,11 +20,12 @@ import java.util.Set;
  * This is the class that should contain most of the business logic for our system, and it is the
  * class you will be writing unit tests for.
  */
-public class SecurityService {
+public class SecurityService extends JPanel {
 
     private FakeImageService imageService;
     private SecurityRepository securityRepository;
     private Set<StatusListener> statusListeners = new HashSet<>();
+
 
     public SecurityService(SecurityRepository securityRepository, FakeImageService imageService) {
         this.securityRepository = new PretendDatabaseSecurityRepositoryImpl();
@@ -34,6 +40,15 @@ public class SecurityService {
     public void setArmingStatus(ArmingStatus armingStatus) {
         if(armingStatus == ArmingStatus.DISARMED) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
+        } else if (armingStatus == ArmingStatus.ARMED_HOME){
+            getSensors().forEach(s->{
+                if(s.getActive().equals(true)) {
+                    s.setActive(false);
+
+                }
+
+            });
+
         }
         securityRepository.setArmingStatus(armingStatus);
     }
@@ -41,7 +56,9 @@ public class SecurityService {
     /**
      * Internal method that handles alarm status changes based on whether
      * the camera currently shows a cat.
+     *
      * @param cat True if a cat is detected, otherwise false.
+     * @return
      */
     private void catDetected(Boolean cat) {
         if(cat && getArmingStatus() == ArmingStatus.ARMED_HOME) {
@@ -51,6 +68,7 @@ public class SecurityService {
         }
 
         statusListeners.forEach(sl -> sl.catDetected(cat));
+
     }
 
     /**
@@ -82,10 +100,16 @@ public class SecurityService {
             return; //no problem if the system is disarmed
         }
         switch(securityRepository.getAlarmStatus()) {
-            case NO_ALARM ->
-                setAlarmStatus(AlarmStatus.PENDING_ALARM);
+            case NO_ALARM ->{
+                    if(securityRepository.getArmingStatus() == ArmingStatus.ARMED_HOME) {
+                        setAlarmStatus(AlarmStatus.PENDING_ALARM);
+                    }}
 
-            case PENDING_ALARM -> setAlarmStatus(AlarmStatus.ALARM);
+            case PENDING_ALARM -> {
+                if (ArmingStatus.ARMED_HOME == securityRepository.getArmingStatus()) {
+                    setAlarmStatus(AlarmStatus.ALARM);
+                }
+            }
 
             default -> System.out.println("this is the default from handleSensorActivated");
         };
@@ -145,4 +169,5 @@ public class SecurityService {
     public ArmingStatus getArmingStatus() {
         return securityRepository.getArmingStatus();
     }
+
 }

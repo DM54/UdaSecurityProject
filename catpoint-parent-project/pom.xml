@@ -70,6 +70,8 @@
             <argLine>
               --add-opens com.udacity.SecurityService/com.udacity.SecurityService.service=ALL-UNNAMED
               --add-opens java.base/java.lang=ALL-UNNAMED
+              --add-opens java.desktop/javax.swing=ALL-UNNAMED
+              --add-opens java.desktop/java.awt=ALL-UNNAMED
             </argLine>
           </configuration>
         </plugin>

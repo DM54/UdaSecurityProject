@@ -2,6 +2,7 @@ package com.udacity.SecurityService.application;
 
 import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.ImageService.service.StyleService;
+import com.udacity.SecurityService.data.ArmingStatus;
 import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
 import com.udacity.SecurityService.data.SensorType;
 import com.udacity.SecurityService.data.Sensor;
@@ -9,6 +10,14 @@ import com.udacity.SecurityService.service.SecurityService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.time.temporal.JulianFields;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Panel that allows users to add sensors to their system. Sensors may be
@@ -27,7 +36,6 @@ public class SensorPanel extends JPanel {
 
     private JPanel sensorListPanel;
     private JPanel newSensorPanel;
-
     public SensorPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
@@ -75,17 +83,22 @@ public class SensorPanel extends JPanel {
             JButton sensorToggleButton = new JButton((s.getActive() ? "Deactivate" : "Activate"));
             JButton sensorRemoveButton = new JButton("Remove Sensor");
 
-            sensorToggleButton.addActionListener(e -> setSensorActivity(s, !s.getActive()) );
+            sensorToggleButton.addActionListener(e -> setSensorActivity(s, !s.getActive()));
             sensorRemoveButton.addActionListener(e -> removeSensor(s));
 
             //hard code some sizes, tsk tsk
             p.add(sensorLabel, "width 300:300:300");
             p.add(sensorToggleButton, "width 100:100:100");
             p.add(sensorRemoveButton, "wrap");
+
+
+
         });
 
         repaint();
         revalidate();
+
+
     }
 
     /**
