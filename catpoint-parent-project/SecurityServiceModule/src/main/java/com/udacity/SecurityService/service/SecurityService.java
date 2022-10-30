@@ -6,6 +6,7 @@ import com.udacity.SecurityService.application.SensorPanel;
 import com.udacity.SecurityService.application.StatusListener;
 import com.udacity.SecurityService.data.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
@@ -25,8 +26,7 @@ public class SecurityService extends JPanel {
     private FakeImageService imageService;
     private SecurityRepository securityRepository;
     private Set<StatusListener> statusListeners = new HashSet<>();
-
-
+    private BufferedImage currentCameraImage = new BufferedImage(200,200,BufferedImage.TYPE_INT_RGB);
     public SecurityService(SecurityRepository securityRepository, FakeImageService imageService) {
         this.securityRepository = new PretendDatabaseSecurityRepositoryImpl();
         this.imageService = imageService;
@@ -41,15 +41,14 @@ public class SecurityService extends JPanel {
         if(armingStatus == ArmingStatus.DISARMED) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         } else if (armingStatus == ArmingStatus.ARMED_HOME){
-            getSensors().forEach(s->{
-                if(s.getActive().equals(true)) {
-                    s.setActive(false);
-
-                }
-
-            });
+            for (Sensor s: securityRepository.getSensors()
+                 ) {
+                s.setActive(false);
+                changeSensorActivationStatus(s, !s.getActive());
+            }
 
         }
+
         securityRepository.setArmingStatus(armingStatus);
     }
 
@@ -68,7 +67,6 @@ public class SecurityService extends JPanel {
         }
 
         statusListeners.forEach(sl -> sl.catDetected(cat));
-
     }
 
     /**
@@ -97,18 +95,18 @@ public class SecurityService extends JPanel {
      */
     private void handleSensorActivated() {
         if(securityRepository.getArmingStatus() == ArmingStatus.DISARMED) {
-            return; //no problem if the system is disarmed
+           setAlarmStatus(AlarmStatus.ALARM);
+            return;
         }
         switch(securityRepository.getAlarmStatus()) {
-            case NO_ALARM ->{
-                    if(securityRepository.getArmingStatus() == ArmingStatus.ARMED_HOME) {
-                        setAlarmStatus(AlarmStatus.PENDING_ALARM);
-                    }}
+            case NO_ALARM ->
+                // if(securityRepository.getArmingStatus() == ArmingStatus.ARMED_HOME && AlarmStatus.NO_ALARM.equals(securityRepository.getAlarmStatus())) {
+                setAlarmStatus(AlarmStatus.PENDING_ALARM);
 
             case PENDING_ALARM -> {
-                if (ArmingStatus.ARMED_HOME == securityRepository.getArmingStatus()) {
+               // if (ArmingStatus.ARMED_HOME == securityRepository.getArmingStatus() && AlarmStatus.PENDING_ALARM.equals(securityRepository.getAlarmStatus())) {
                     setAlarmStatus(AlarmStatus.ALARM);
-                }
+                //}
             }
 
             default -> System.out.println("this is the default from handleSensorActivated");
@@ -120,8 +118,15 @@ public class SecurityService extends JPanel {
      */
     private void handleSensorDeactivated() {
         switch(securityRepository.getAlarmStatus()) {
-            case PENDING_ALARM -> setAlarmStatus(AlarmStatus.NO_ALARM);
-            case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
+            case PENDING_ALARM -> {
+
+                    setAlarmStatus(AlarmStatus.NO_ALARM);
+                }
+
+            case ALARM -> {
+                    setAlarmStatus(AlarmStatus.PENDING_ALARM);
+            }
+
             default -> System.out.println("this is the default from handleSensorDeactivated");
         };
     }
@@ -148,6 +153,18 @@ public class SecurityService extends JPanel {
      */
     public void processImage(BufferedImage currentCameraImage) {
         catDetected(imageService.imageContainsCat(currentCameraImage, 50.0f));
+
+        securityRepository.getSensors().stream().forEach(sensor -> {
+
+            if (imageService.imageContainsCat(currentCameraImage,50.0f) == false && sensor.getActive().equals(false)) {
+                catDetected(imageService.imageContainsCat(currentCameraImage, 50.0f));
+                setAlarmStatus(AlarmStatus.NO_ALARM);
+            } else if (imageService.imageContainsCat(currentCameraImage, 50.0f) == true &&
+                    ArmingStatus.ARMED_HOME.equals(securityRepository.getArmingStatus())) {
+                setAlarmStatus(AlarmStatus.ALARM);
+            }
+        });
+
     }
 
     public AlarmStatus getAlarmStatus() {

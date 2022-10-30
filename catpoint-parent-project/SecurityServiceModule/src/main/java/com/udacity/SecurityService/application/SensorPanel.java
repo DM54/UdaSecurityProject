@@ -92,7 +92,6 @@ public class SensorPanel extends JPanel {
             p.add(sensorRemoveButton, "wrap");
 
 
-
         });
 
         repaint();
