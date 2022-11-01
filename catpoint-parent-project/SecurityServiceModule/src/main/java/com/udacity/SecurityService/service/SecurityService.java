@@ -52,17 +52,24 @@ public class SecurityService extends JPanel {
                             " " + s.getName() +" "+ s.getSensorType()+ " " + s.getActive());
                     changeSensorActivationStatus(s, !s.getActive());
 
-
-            }
-            //test 11
-            securityRepository.getSensors().forEach(sensor -> {
-                sensor.setActive(false);
-                changeSensorActivationStatus(sensor,!sensor.getActive());
-            });
+                   cat_detecting();
         }
 
         securityRepository.setArmingStatus(armingStatus);
     }
+    }
+    public void cat_detecting() {
+
+        //test 11
+        securityRepository.getSensors().forEach(sensor -> {
+            //sensor.setActive(false);
+
+                changeSensorActivationStatus(sensor, !sensor.getActive());
+
+            //setAlarmStatus(AlarmStatus.ALARM);
+        });
+    }
+
 
     /**
      * Internal method that handles alarm status changes based on whether
@@ -107,18 +114,21 @@ public class SecurityService extends JPanel {
      */
     private void handleSensorActivated() {
         if(securityRepository.getArmingStatus() == ArmingStatus.DISARMED) {
-         setAlarmStatus(AlarmStatus.ALARM);
+        // setAlarmStatus(AlarmStatus.ALARM);
             return;
         }
         switch(securityRepository.getAlarmStatus()) {
-            case NO_ALARM ->
-                // if(securityRepository.getArmingStatus() == ArmingStatus.ARMED_HOME && AlarmStatus.NO_ALARM.equals(securityRepository.getAlarmStatus())) {
-                setAlarmStatus(AlarmStatus.PENDING_ALARM);
+            case NO_ALARM -> {
+                if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
+                    setAlarmStatus(AlarmStatus.ALARM);
+                }
+               // setAlarmStatus(AlarmStatus.PENDING_ALARM);
+            }
 
             case PENDING_ALARM -> {
-               // if (ArmingStatus.ARMED_HOME == securityRepository.getArmingStatus() && AlarmStatus.PENDING_ALARM.equals(securityRepository.getAlarmStatus())) {
+               if (ArmingStatus.ARMED_HOME == securityRepository.getArmingStatus()) {
                     setAlarmStatus(AlarmStatus.ALARM);
-                //}
+                }
             }
 
             default -> {
@@ -134,7 +144,6 @@ public class SecurityService extends JPanel {
 
         switch(securityRepository.getAlarmStatus()) {
             case PENDING_ALARM -> {
-
                     setAlarmStatus(AlarmStatus.NO_ALARM);
                 }
 
