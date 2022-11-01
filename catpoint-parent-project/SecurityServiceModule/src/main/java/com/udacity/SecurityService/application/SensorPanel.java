@@ -91,7 +91,6 @@ public class SensorPanel extends JPanel {
             p.add(sensorToggleButton, "width 100:100:100");
             p.add(sensorRemoveButton, "wrap");
 
-
         });
 
         repaint();
@@ -132,3 +131,4 @@ public class SensorPanel extends JPanel {
         updateSensorList(sensorListPanel);
     }
 }
+

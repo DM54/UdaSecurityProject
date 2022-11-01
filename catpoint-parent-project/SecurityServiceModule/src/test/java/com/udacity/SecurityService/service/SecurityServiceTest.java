@@ -188,40 +188,38 @@ public class SecurityServiceTest {
     }*/
 
     @ParameterizedTest
-    @DisplayName("ARMED_AWAYOrARMED_HOMEOrDISARMED")
-    @ValueSource(strings = {"ARMED_AWAY", "ARMED_HOME", "DISARMED"})
+    @DisplayName("Test 9, 10 , 11")
+    @ValueSource(strings = {"NINE", "TEN", "ELEVEN"})
     public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach(String args) throws Exception {
         assertNotNull(args);
+
+
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
+        if (securityRepository.getArmingStatus().equals(ArmingStatus.DISARMED)) {
+            when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
+            securityRepository.setAlarmStatus(NO_ALARM);
+            assertEquals(NO_ALARM, securityRepository.getAlarmStatus());
+        }
+
+
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
 
         if (ArmingStatus.ARMED_HOME.equals(securityRepository.getArmingStatus())) {
-          /*  controlPanel.ButtonsControlSystem().forEach((k, v) -> {
-               when(v.getText()).thenReturn(ArmingStatus.ARMED_HOME.getDescription());
-               assertEquals(v.getText(), ArmingStatus.ARMED_HOME.getDescription());
-               if(v.getText().equals(ArmingStatus.ARMED_HOME.getDescription())){
-                   securityService.getSensors().stream().forEach((k2)-> {
+
+                   securityRepository.getSensors().stream().forEach((k2)-> {
                        Object kk;
                        try {
                            k2.setActive(false);
-                           System.out.println(k2.getActive() + "" + k2.getName() + " " + k2.getSensorType());
+                           //System.out.println(k2.getActive() + "" + k2.getName() + " " + k2.getSensorType());
                            kk = Whitebox.invokeMethod(panel, "setSensorActivity", new Sensor(k2.getName(), k2.getSensorType()), k2.getActive());
                        } catch (Exception e) {
                            throw new RuntimeException(e);
                        }
                        assertEquals(k2.getActive(), kk);
-                   });*/
+                   });
 
         }
         assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
-
-        //  }
-
-        /*when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
-        if (securityRepository.getArmingStatus().equals(ArmingStatus.DISARMED)) {
-            when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
-            securityRepository.setAlarmStatus(NO_ALARM);
-            assertEquals(NO_ALARM, securityRepository.getAlarmStatus());
-        }*/
 
 
             when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
