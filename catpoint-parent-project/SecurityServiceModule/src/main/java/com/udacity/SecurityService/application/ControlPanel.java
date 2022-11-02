@@ -25,6 +25,13 @@ public class ControlPanel extends JPanel {
     private SecurityService securityService;
     private Map<ArmingStatus, JButton> buttonMap;
 
+    private SensorPanel sensorPanel;
+
+    public void SetSensorPanelInstance(SensorPanel sensorPanel){
+        this.sensorPanel = sensorPanel;
+    }
+
+
     public ControlPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
@@ -45,6 +52,7 @@ public class ControlPanel extends JPanel {
                 securityService.setArmingStatus(k);
                 buttonMap.forEach((status, button) -> button.setBackground(status == k ? status.getColor() : null));
             });
+
         });
 
         //map order above is arbitrary, so loop again in order to add buttons in enum-order

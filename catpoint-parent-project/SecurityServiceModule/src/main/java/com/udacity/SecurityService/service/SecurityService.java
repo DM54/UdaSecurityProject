@@ -30,10 +30,12 @@ public class SecurityService extends JPanel {
     private SecurityRepository securityRepository;
     private Set<StatusListener> statusListeners = new HashSet<>();
     private BufferedImage currentCameraImage = new BufferedImage(200,200,BufferedImage.TYPE_INT_RGB);
+
     public SecurityService(SecurityRepository securityRepository, FakeImageService imageService) {
         this.securityRepository = new PretendDatabaseSecurityRepositoryImpl();
         this.imageService = imageService;
     }
+
 
     /**
      * Sets the current arming status for the system. Changing the arming status
@@ -47,12 +49,11 @@ public class SecurityService extends JPanel {
             //test 10
             for (Sensor s : securityRepository.getSensors()
             ) {
-                s.setActive(true);
+                s.setActive(false);
 
                 System.out.println("this is set home to inactive " +
                         " " + s.getName() + " " + s.getSensorType() + " " + s.getActive());
                 changeSensorActivationStatus(s, !s.getActive());
-
             }
 
             cat_detecting();
@@ -60,6 +61,9 @@ public class SecurityService extends JPanel {
         }
         securityRepository.setArmingStatus(armingStatus);
     }
+
+
+
     public void cat_detecting() {
 
         //test 11
