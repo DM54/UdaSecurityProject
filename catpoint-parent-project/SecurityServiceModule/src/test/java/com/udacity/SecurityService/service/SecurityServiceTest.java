@@ -188,8 +188,8 @@ public class SecurityServiceTest {
     }
 
     @ParameterizedTest
-    @DisplayName("Test 9, 10 , 11")
-    @ValueSource(strings = {"NINE", "TEN", "ELEVEN"})
+    @DisplayName("ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach")
+    @ValueSource(strings = {"NINE- DISARMED", "TEN - ARMED_HOME", "ELEVEN - CAT DETECTED"})
     public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach(String args) throws Exception {
         assertNotNull(args);
 
