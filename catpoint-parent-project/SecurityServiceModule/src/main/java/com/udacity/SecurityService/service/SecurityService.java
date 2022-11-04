@@ -70,7 +70,7 @@ public class SecurityService extends JPanel {
        securityRepository.getSensors().forEach(sensor -> {
             //changeSensorActivationStatus(sensor, !sensor.getActive());
 
-           if(sensor.getActive().equals(false)) {
+           if(!sensor.getActive().equals(false)) {
                setAlarmStatus(AlarmStatus.ALARM);
            }
         });
