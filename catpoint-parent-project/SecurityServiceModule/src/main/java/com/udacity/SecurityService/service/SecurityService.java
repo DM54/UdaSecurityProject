@@ -1,20 +1,11 @@
 package com.udacity.SecurityService.service;
 
 import com.udacity.ImageService.service.FakeImageService;
-import com.udacity.SecurityService.application.ImagePanel;
-import com.udacity.SecurityService.application.SensorPanel;
 import com.udacity.SecurityService.application.StatusListener;
 import com.udacity.SecurityService.data.*;
-
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,7 +36,8 @@ public class SecurityService extends JPanel {
     public void setArmingStatus(ArmingStatus armingStatus) {
         if(armingStatus == ArmingStatus.DISARMED) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
-        } else if (armingStatus == ArmingStatus.ARMED_HOME) {
+          //  securityRepository.setArmingStatus(armingStatus);
+        } else if (armingStatus == ArmingStatus.ARMED_HOME || armingStatus == ArmingStatus.ARMED_AWAY) {
             //test 10
             for (Sensor s : securityRepository.getSensors()
             ) {
@@ -54,12 +46,15 @@ public class SecurityService extends JPanel {
                 System.out.println("this is set home to inactive " +
                         " " + s.getName() + " " + s.getSensorType() + " " + s.getActive());
                 changeSensorActivationStatus(s, !s.getActive());
-            }
 
-            cat_detecting();
+
+            }
+            setAlarmStatus(AlarmStatus.ALARM);
+           // securityRepository.setArmingStatus(armingStatus);
 
         }
         securityRepository.setArmingStatus(armingStatus);
+
     }
 
 
@@ -69,9 +64,9 @@ public class SecurityService extends JPanel {
         //test 11
        securityRepository.getSensors().forEach(sensor -> {
             //changeSensorActivationStatus(sensor, !sensor.getActive());
-
            if(!sensor.getActive().equals(false)) {
                setAlarmStatus(AlarmStatus.ALARM);
+               //statusListeners.forEach(statusListener -> processImage(currentCameraImage));
            }
         });
 
