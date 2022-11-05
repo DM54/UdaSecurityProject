@@ -57,22 +57,6 @@ public class SecurityService extends JPanel {
 
     }
 
-
-
-    public void cat_detecting() {
-
-        //test 11
-       securityRepository.getSensors().forEach(sensor -> {
-            //changeSensorActivationStatus(sensor, !sensor.getActive());
-           if(!sensor.getActive().equals(false)) {
-               setAlarmStatus(AlarmStatus.ALARM);
-               //statusListeners.forEach(statusListener -> processImage(currentCameraImage));
-           }
-        });
-
-    }
-
-
     /**
      * Internal method that handles alarm status changes based on whether
      * the camera currently shows a cat.
