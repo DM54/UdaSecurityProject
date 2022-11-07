@@ -15,12 +15,12 @@ import java.util.Set;
  * This is the class that should contain most of the business logic for our system, and it is the
  * class you will be writing unit tests for.
  */
-public class SecurityService extends JPanel {
+public class SecurityService{
 
     private FakeImageService imageService;
-    private SecurityRepository securityRepository;
+    private transient SecurityRepository securityRepository;
     private Set<StatusListener> statusListeners = new HashSet<>();
-    private BufferedImage currentCameraImage = new BufferedImage(200,200,BufferedImage.TYPE_INT_RGB);
+
 
     public SecurityService(SecurityRepository securityRepository, FakeImageService imageService) {
         this.securityRepository = new PretendDatabaseSecurityRepositoryImpl();
@@ -49,7 +49,7 @@ public class SecurityService extends JPanel {
 
 
             }
-            setAlarmStatus(AlarmStatus.ALARM);
+            //setAlarmStatus(AlarmStatus.ALARM);
            // securityRepository.setArmingStatus(armingStatus);
 
         }
