@@ -152,13 +152,15 @@ public class SecurityServiceTest {
    @Test
     public void IfImageService_identifiesImageContaining_ACat_systemArmedHome_putSystem_intoAlarmStatus() throws Exception {
         BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
-        when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
-        securityService.processImage(bufferedImage);
-        Whitebox.invokeMethod(securityService, "catDetected", true);
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
         if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
-            securityService.setAlarmStatus(ALARM);
+            Whitebox.invokeMethod(securityService, "catDetected", true);
+            when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
+            securityService.processImage(bufferedImage);
+            when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
+            securityRepository.setAlarmStatus(ALARM);
             assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
+            assertEquals(ALARM,securityRepository.getAlarmStatus());
         }
 
     }
@@ -166,15 +168,15 @@ public class SecurityServiceTest {
     @Test
     public void IfImageService_identifiesImageNot_ACat_changeStatus_toNoAlarm_asLongAs_sensorsNotActive() throws Exception {
         BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
-        when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
+        when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(false);
         securityService.processImage(bufferedImage);
         Whitebox.invokeMethod(securityService, "catDetected", false);
         if (sensor.getActive().equals(false)) {
             when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
-            securityService.setAlarmStatus(NO_ALARM);
+            securityRepository.setAlarmStatus(NO_ALARM);
             assertEquals(AlarmStatus.NO_ALARM, securityRepository.getAlarmStatus());
+            assertEquals(false,sensor.getActive());
         }
-
        // verify(imageService).imageContainsCat(bufferedImage,50.0f);
     }
 
@@ -183,6 +185,7 @@ public class SecurityServiceTest {
     @ValueSource(strings = {"DISARMED", "ARMED_HOME", "ARMED_AWAY"})
     public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach(String args) throws Exception {
         assertNotNull(args);
+        BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.valueOf(args));
        // when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
         if (securityRepository.getArmingStatus().equals(ArmingStatus.DISARMED)) {
@@ -191,9 +194,10 @@ public class SecurityServiceTest {
             securityRepository.setAlarmStatus(NO_ALARM);
             assertEquals(NO_ALARM, securityRepository.getAlarmStatus());
             assertEquals(ArmingStatus.DISARMED,securityRepository.getArmingStatus());
+            securityService.setArmingStatus(ArmingStatus.DISARMED);
         }
 
-      if(securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_AWAY) ||
+     else if(securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_AWAY) ||
               securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
           securityRepository.getSensors().forEach((k2) -> {
               k2.setActive(false);
@@ -206,18 +210,15 @@ public class SecurityServiceTest {
           securityService.setArmingStatus(ArmingStatus.ARMED_AWAY);
    }
 
-    //when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
-    BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
-
-    when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
-    securityService.processImage(bufferedImage);
-    if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
+  else if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
         Whitebox.invokeMethod(securityService, "catDetected", true);
+        when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
+        securityService.processImage(bufferedImage);
         when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
-        if (securityRepository.getAlarmStatus().equals(ALARM)) {
+      //  if (securityRepository.getAlarmStatus().equals(ALARM)) {
             assertEquals(ALARM, securityRepository.getAlarmStatus());
             assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
-        }
+            securityService.setAlarmStatus(ALARM);
     }
 
     }
