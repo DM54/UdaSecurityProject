@@ -40,7 +40,7 @@ public class SecurityService{
             for (Sensor s : securityRepository.getSensors()
             ) {
                 s.setActive(false);
-              //  changeSensorActivationStatus(s, !s.getActive());
+                changeSensorActivationStatus(s, !s.getActive());
             }
         }
         securityRepository.setArmingStatus(armingStatus);
