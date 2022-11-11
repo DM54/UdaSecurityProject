@@ -1,4 +1,4 @@
-package com.udacity.ImageService.service;
+package com.udacity.SecurityService.service;
 
 import java.awt.*;
 

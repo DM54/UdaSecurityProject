@@ -1,8 +1,7 @@
 package com.udacity.SecurityService.application;
 
 import com.udacity.ImageService.service.FakeImageService;
-import com.udacity.ImageService.service.StyleService;
-import com.udacity.SecurityService.data.ArmingStatus;
+import com.udacity.SecurityService.service.StyleService;
 import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
 import com.udacity.SecurityService.data.SensorType;
 import com.udacity.SecurityService.data.Sensor;
@@ -10,14 +9,6 @@ import com.udacity.SecurityService.service.SecurityService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.time.temporal.JulianFields;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Panel that allows users to add sensors to their system. Sensors may be

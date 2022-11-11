@@ -3,17 +3,11 @@ package com.udacity.SecurityService.application;
 import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.data.ArmingStatus;
 import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
-import com.udacity.SecurityService.data.SecurityRepository;
-import com.udacity.SecurityService.data.Sensor;
 import com.udacity.SecurityService.service.SecurityService;
-import com.udacity.ImageService.service.StyleService;
+import com.udacity.SecurityService.service.StyleService;
 import net.miginfocom.swing.MigLayout;
-import net.miginfocom.layout.*;
+
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
