@@ -10,7 +10,7 @@ module com.udacity.SecurityService {
     exports com.udacity.SecurityService.service;
     opens com.udacity.SecurityService.application to com.udacity.ImageService;
     //exports com.udacity.SecurityService.data;
-    opens com.udacity.SecurityService.data to  com.udacity.ImageService;
+    opens com.udacity.SecurityService.data to  com.google.gson;
     exports com.udacity.SecurityService;
 
 

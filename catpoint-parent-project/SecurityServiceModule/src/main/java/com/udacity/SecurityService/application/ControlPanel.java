@@ -8,6 +8,7 @@ import com.udacity.SecurityService.service.StyleService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,8 @@ public class ControlPanel extends JPanel {
         //add an action listener to each button that applies its arming status and recolors all the buttons
         buttonMap.forEach((k, v) -> {
             v.addActionListener(e -> {
-                securityService.setArmingStatus(k);
+                    securityService.setArmingStatus(k);
+
                 buttonMap.forEach((status, button) -> button.setBackground(status == k ? status.getColor() : null));
             });
 

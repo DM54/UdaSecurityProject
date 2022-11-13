@@ -17,13 +17,16 @@ public class Sensor implements Comparable<Sensor> {
     private Boolean active;
     private SensorType sensorType;
 
+    public Sensor(){
+
+    }
+
     public Sensor(String name, SensorType sensorType) {
         this.name = name;
         this.sensorType = sensorType;
         this.sensorId = UUID.randomUUID();
         this.active = Boolean.FALSE;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,6 +1,7 @@
 package com.udacity.SecurityService.application;
 
 import com.udacity.ImageService.service.FakeImageService;
+import com.udacity.SecurityService.data.ArmingStatus;
 import com.udacity.SecurityService.service.StyleService;
 import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
 import com.udacity.SecurityService.data.SensorType;
@@ -16,7 +17,7 @@ import javax.swing.*;
  */
 public class SensorPanel extends JPanel {
 
-    private SecurityService securityService;
+    private SecurityService securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
 
     private JLabel panelLabel = new JLabel("Sensor Management");
     private JLabel newSensorName = new JLabel("Name:");
@@ -25,8 +26,14 @@ public class SensorPanel extends JPanel {
     private JComboBox newSensorTypeDropdown = new JComboBox(SensorType.values());
     private JButton addNewSensorButton = new JButton("Add New Sensor");
 
-    private JPanel sensorListPanel;
-    private JPanel newSensorPanel;
+    private JPanel sensorListPanel = new JPanel();
+    private JPanel newSensorPanel = new JPanel();
+
+
+    public SensorPanel(){
+
+    }
+
     public SensorPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
@@ -74,7 +81,7 @@ public class SensorPanel extends JPanel {
             JButton sensorToggleButton = new JButton((s.getActive() ? "Deactivate" : "Activate"));
             JButton sensorRemoveButton = new JButton("Remove Sensor");
 
-            sensorToggleButton.addActionListener(e -> setSensorActivity(s, !s.getActive()));
+            sensorToggleButton.addActionListener(e ->  setSensorActivity(s, !s.getActive()));
             sensorRemoveButton.addActionListener(e -> removeSensor(s));
 
             //hard code some sizes, tsk tsk

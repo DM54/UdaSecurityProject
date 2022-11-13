@@ -90,7 +90,8 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
 
     @Override
     public Set<Sensor> getSensors() {
-        return Set.copyOf(sensors);
+        //return Set.copyOf(sensors);
+        return sensors;
     }
 
     @Override
