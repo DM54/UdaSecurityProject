@@ -3,12 +3,17 @@ package com.udacity.SecurityService.application;
 import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.data.ArmingStatus;
 import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
+import com.udacity.SecurityService.data.SecurityRepository;
+import com.udacity.SecurityService.data.Sensor;
 import com.udacity.SecurityService.service.SecurityService;
 import com.udacity.SecurityService.service.StyleService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,6 +24,9 @@ public class ControlPanel extends JPanel {
 
     private SecurityService securityService;
     private Map<ArmingStatus, JButton> buttonMap;
+
+    private SecurityRepository securityRepository = new PretendDatabaseSecurityRepositoryImpl();
+
 
     public ControlPanel(SecurityService securityService) {
         super();
@@ -38,7 +46,6 @@ public class ControlPanel extends JPanel {
         buttonMap.forEach((k, v) -> {
             v.addActionListener(e -> {
                     securityService.setArmingStatus(k);
-
                 buttonMap.forEach((status, button) -> button.setBackground(status == k ? status.getColor() : null));
             });
 

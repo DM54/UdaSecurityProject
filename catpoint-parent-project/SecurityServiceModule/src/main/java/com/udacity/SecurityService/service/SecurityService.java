@@ -45,19 +45,19 @@ public class SecurityService{
             for (Sensor s : securityRepository.getSensors()
             ) {
                // Sensor s = new Sensor();
-                SensorPanel sensorPanel = new SensorPanel();
-                try {
-                    Method method = sensorPanel.getClass().getDeclaredMethod("setSensorActivity", Sensor.class, Boolean.class);
-                    method.setAccessible(true);
+                //SensorPanel sensorPanel = new SensorPanel();
+               /* try {
+                   // Method method = sensorPanel.getClass().getDeclaredMethod("setSensorActivity", Sensor.class, Boolean.class);
+                    //method.setAccessible(true);
                     s.setActive(false);
-                    method.invoke(sensorPanel, s, !s.getActive());
+                    //method.invoke(sensorPanel, s, !s.getActive());
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException(e);
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
-                }
+                }*/
                 // s.setActive(false);
                 //changeSensorActivationStatus(s, s.getActive());
             }
@@ -66,6 +66,10 @@ public class SecurityService{
 
         securityRepository.setArmingStatus(armingStatus);
     }
+
+
+
+
     /**
      * Internal method that handles alarm status changes based on whether
      * the camera currently shows a cat.
@@ -76,7 +80,7 @@ public class SecurityService{
     private void catDetected(Boolean cat) {
         if(cat && getArmingStatus() == ArmingStatus.ARMED_HOME) {
             setAlarmStatus(AlarmStatus.ALARM);
-        } else {
+        } else if(!cat && getSensors().stream().allMatch(sensor -> sensor.getActive().equals(false))) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         }
 
@@ -140,15 +144,14 @@ public class SecurityService{
      * @param active
      */
     public void changeSensorActivationStatus(Sensor sensor, Boolean active) {
-       // if(getArmingStatus().equals(ArmingStatus.ARMED_HOME) || getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
+       if(securityRepository.getAlarmStatus().equals(AlarmStatus.NO_ALARM) || securityRepository.getAlarmStatus().equals(AlarmStatus.PENDING_ALARM)) {
             if (!sensor.getActive() && active) {
-
                 handleSensorActivated();
 
             } else if (sensor.getActive() && !active) {
                 handleSensorDeactivated();
             }
-     //   }
+      }
 
         sensor.setActive(active);
         securityRepository.updateSensor(sensor);

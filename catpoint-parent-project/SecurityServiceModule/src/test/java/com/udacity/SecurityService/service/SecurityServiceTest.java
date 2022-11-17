@@ -20,6 +20,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.powermock.reflect.Whitebox;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 import static com.udacity.SecurityService.data.AlarmStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +33,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SecurityServiceTest {
-    @InjectMocks
     private SecurityService securityService;
     @Mock
     private SecurityRepository securityRepository = new PretendDatabaseSecurityRepositoryImpl();
@@ -41,6 +44,8 @@ public class SecurityServiceTest {
     private SensorPanel panel;
     @Mock
     private ControlPanel controlPanel;
+    @Mock
+    private StatusListener statusListener;
 
     @BeforeEach
     public void init() {
@@ -50,18 +55,19 @@ public class SecurityServiceTest {
     @Test
    public void If_alarm_isArmed_andSensor_becomesActivated_put_theSystem_intoPendingAlarmStatus() throws Exception {
 
-        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_AWAY);
-        securityService.addSensor(sensor);
-        if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)) {
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
+        //securityService.addSensor(sensor);
+       // if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
             securityService.changeSensorActivationStatus(sensor, true);
-            Whitebox.invokeMethod(securityService,  "handleSensorActivated");
-            when(securityRepository.getAlarmStatus()).thenReturn(PENDING_ALARM);
-            if (securityRepository.getAlarmStatus().equals(PENDING_ALARM)) {
-                securityService.setAlarmStatus(PENDING_ALARM);
-                assertEquals(ArmingStatus.ARMED_AWAY, securityRepository.getArmingStatus());
-                assertEquals(PENDING_ALARM, securityRepository.getAlarmStatus());
-            }
-        }
+           // Whitebox.invokeMethod(securityService,  "handleSensorActivated");
+            when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
+           if (securityRepository.getAlarmStatus().equals(NO_ALARM)) {
+                securityRepository.setAlarmStatus(PENDING_ALARM);
+                assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
+                //assertEquals(PENDING_ALARM, securityRepository.getAlarmStatus());
+                verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.PENDING_ALARM);
+           }
+      //  }
 
     }
 
@@ -110,10 +116,11 @@ public class SecurityServiceTest {
 
     @Test
     public void IfAlarm_active_change_sensorState_shouldNotAffect_AlarmState() throws Exception {
-       when(sensor.getActive()).thenReturn(true);
-        securityService.changeSensorActivationStatus(sensor, false);
-        Whitebox.invokeMethod(securityService,"handleSensorDeactivated");
-        assertEquals(true,sensor.getActive());
+       when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
+       if(sensor.getActive().equals(true)|| sensor.getActive().equals(false) && securityRepository.getAlarmStatus().equals(ALARM)) {
+           securityService.changeSensorActivationStatus(sensor, sensor.getActive());
+       }
+        verify(securityRepository, never()).setAlarmStatus(any(AlarmStatus.class));
 
     }
 
@@ -122,14 +129,14 @@ public class SecurityServiceTest {
 
         when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
         if (securityRepository.getAlarmStatus().equals(ALARM)) {
+            sensor.setActive(true);
             securityService.changeSensorActivationStatus(sensor, true);
             //when(sensor.getActive()).thenReturn(false);
            // if(sensor.getActive().equals(true)){
-                securityRepository.setAlarmStatus(ALARM);
+                //securityRepository.setAlarmStatus(ALARM);
          //   }
-            Whitebox.invokeMethod
-                    (securityService, "handleSensorActivated");
             assertEquals(ALARM, securityRepository.getAlarmStatus());
+            verify(securityRepository, never()).setAlarmStatus(any(AlarmStatus.class));
 
         }
 
@@ -138,12 +145,14 @@ public class SecurityServiceTest {
     @Test
     public void IfSensor_deactivated_alreadyInactive_makeNoChanges_toTheAlarmState() throws Exception {
         when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
-        if (securityRepository.getAlarmStatus().equals(ALARM)) {
+       if (securityRepository.getAlarmStatus().equals(ALARM)) {
+            sensor.setActive(false);
             securityService.changeSensorActivationStatus(sensor, false);
             // when(s.getActive()).thenReturn(false);
-            Whitebox.invokeMethod
-                    (securityService, "handleSensorDeactivated");
+           // Whitebox.invokeMethod
+                 //   (securityService, "handleSensorDeactivated");
             assertEquals(ALARM, securityRepository.getAlarmStatus());
+            verify(securityRepository, never()).setAlarmStatus(any(AlarmStatus.class));
 
         }
 

@@ -29,11 +29,6 @@ public class SensorPanel extends JPanel {
     private JPanel sensorListPanel = new JPanel();
     private JPanel newSensorPanel = new JPanel();
 
-
-    public SensorPanel(){
-
-    }
-
     public SensorPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
@@ -43,6 +38,7 @@ public class SensorPanel extends JPanel {
         addNewSensorButton.addActionListener(e ->
                 addSensor(new Sensor(newSensorNameField.getText(),
                         SensorType.valueOf(newSensorTypeDropdown.getSelectedItem().toString()))));
+
 
         newSensorPanel = buildAddSensorPanel();
         sensorListPanel = new JPanel();
