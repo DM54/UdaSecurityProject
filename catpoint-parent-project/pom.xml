@@ -108,6 +108,13 @@
               </descriptorRef>
             </descriptorRefs>
           </configuration>
+          <executions>
+            <execution>
+              <id>assemble-all</id>
+              <phase>package</phase>
+              <goals><goal>single</goal></goals>
+            </execution>
+          </executions>
           <version>3.4.2</version>
         </plugin>
 
