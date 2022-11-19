@@ -4,11 +4,7 @@ import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.application.SensorPanel;
 import com.udacity.SecurityService.application.StatusListener;
 import com.udacity.SecurityService.data.*;
-
-import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -47,8 +43,14 @@ public class SecurityService{
         } else if (armingStatus == ArmingStatus.ARMED_HOME || armingStatus == ArmingStatus.ARMED_AWAY) {
                 if(cats) {
                     setAlarmStatus(AlarmStatus.ALARM);
+                } else if (!cats && securityRepository.getSensors().contains(sensor.getActive())) {
+                    setAlarmStatus(AlarmStatus.ALARM);
+                }else if(securityRepository.getSensors().contains(sensor.getActive())) {
+                    changeSensorActivationStatus(sensor, sensor.getActive());
+                }else {
+                    SystemSensor(sensor);
+
                 }
-                changeSensorActivationStatus(sensor,sensor.getActive());
 
         }
 
