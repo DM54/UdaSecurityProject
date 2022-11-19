@@ -46,8 +46,8 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
 
             GsonBuilder gsonBuilder = new GsonBuilder();
 
-               EnumSet.allOf(SensorType.class).forEach(sensorType -> gsonBuilder.registerTypeAdapter(Sensor.class,
-                       new NewSensorProvider(SENSORS,sensorType)));
+            EnumSet.allOf(SensorType.class).forEach(sensorType -> gsonBuilder.registerTypeAdapter(Sensor.class,
+                    new NewSensorProvider(SENSORS,sensorType)));
 
                 Gson gson1 = gsonBuilder.create();
 

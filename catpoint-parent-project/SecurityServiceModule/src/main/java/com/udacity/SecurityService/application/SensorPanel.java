@@ -29,6 +29,28 @@ public class SensorPanel extends JPanel {
     private JPanel sensorListPanel = new JPanel();
     private JPanel newSensorPanel = new JPanel();
 
+    public SensorPanel(){
+        super();
+        setLayout(new MigLayout());
+        this.securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
+
+        panelLabel.setFont(StyleService.HEADING_FONT);
+        addNewSensorButton.addActionListener(e ->
+                addSensor(new Sensor(newSensorNameField.getText(),
+                        SensorType.valueOf(newSensorTypeDropdown.getSelectedItem().toString()))));
+
+
+        newSensorPanel = buildAddSensorPanel();
+        sensorListPanel = new JPanel();
+        sensorListPanel.setLayout(new MigLayout());
+
+        updateSensorList(sensorListPanel);
+
+        add(panelLabel, "wrap");
+        add(newSensorPanel, "span");
+        add(sensorListPanel, "span");
+    }
+
     public SensorPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
@@ -100,6 +122,7 @@ public class SensorPanel extends JPanel {
      */
     private void setSensorActivity(Sensor sensor, Boolean isActive) {
         securityService.changeSensorActivationStatus(sensor, isActive);
+        securityService.SystemSensor(sensor);
         updateSensorList(sensorListPanel);
     }
 

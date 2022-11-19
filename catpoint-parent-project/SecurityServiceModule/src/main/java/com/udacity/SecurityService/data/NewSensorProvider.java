@@ -8,6 +8,8 @@ import java.lang.reflect.Type;
 public class NewSensorProvider implements InstanceCreator<Sensor> {
     private String name;
     private SensorType sensorType;
+
+    public NewSensorProvider(){}
     public NewSensorProvider(String name, SensorType sensorType){
         this.name = name;
         this.sensorType = sensorType;
