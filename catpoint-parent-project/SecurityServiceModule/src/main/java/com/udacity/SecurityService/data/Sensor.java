@@ -29,6 +29,7 @@ public class Sensor implements Comparable<Sensor> {
         this.sensorType = getSensorType();
         this.sensorId = UUID.randomUUID();
         this.active = Boolean.FALSE;
+        //setActive(false);
     }
     @Override
     public boolean equals(Object o) {

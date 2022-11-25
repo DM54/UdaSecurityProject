@@ -100,6 +100,11 @@ public class SensorPanel extends JPanel {
             JButton sensorRemoveButton = new JButton("Remove Sensor");
 
             sensorToggleButton.addActionListener(e ->  setSensorActivity(s, !s.getActive()));
+            if(ArmingStatus.ARMED_HOME.equals(securityService.getArmingStatus()) &&
+                    sensorLabel.getText().equals("Active")|| ArmingStatus.ARMED_AWAY.equals(securityService.getArmingStatus()) &&
+                    sensorLabel.getText().equals("Active")){
+                sensorToggleButton.setEnabled(true);
+            }
             sensorRemoveButton.addActionListener(e -> removeSensor(s));
 
             //hard code some sizes, tsk tsk
@@ -122,7 +127,6 @@ public class SensorPanel extends JPanel {
      */
     private void setSensorActivity(Sensor sensor, Boolean isActive) {
         securityService.changeSensorActivationStatus(sensor, isActive);
-        securityService.SystemSensor(sensor);
         updateSensorList(sensorListPanel);
     }
 
