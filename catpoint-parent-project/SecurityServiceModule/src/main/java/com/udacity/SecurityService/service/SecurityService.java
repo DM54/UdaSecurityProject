@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Collectors;
 
 /**
  * Service that receives information about changes to the security system. Responsible for
@@ -20,23 +22,16 @@ import java.util.*;
  */
 public class SecurityService{
 
-    private FakeImageService imageService;
-    private transient SecurityRepository securityRepository;
-    private Set<StatusListener> statusListeners = new HashSet<>();
-
-    private BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
-
+    private final FakeImageService imageService;
+    private final SecurityRepository securityRepository;
+    private final Set<StatusListener> statusListeners = new HashSet<>();
     private  Sensor sensor = new Sensor();
-    private boolean cats;
-    private boolean actived;
-
+    private boolean cats = false;
 
     public SecurityService(SecurityRepository securityRepository, FakeImageService imageService) {
-        this.securityRepository = new PretendDatabaseSecurityRepositoryImpl();
+        this.securityRepository = securityRepository;
         this.imageService = imageService;
-        sensor = new Sensor();
     }
-
 
     /**
      * Sets the current arming status for the system. Changing the arming status
@@ -46,34 +41,27 @@ public class SecurityService{
     public void setArmingStatus(ArmingStatus armingStatus) {
         if (armingStatus == ArmingStatus.DISARMED) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
-        } else if (armingStatus == ArmingStatus.ARMED_HOME || armingStatus == ArmingStatus.ARMED_AWAY) {
-                if(cats) {
-                    setAlarmStatus(AlarmStatus.ALARM);
-                } else if(sensor.getActive().equals(true) && sensor.getSensorId().equals(sensor)){
-                       sensor.setActive(false);
-                       try {
-                            Method method = SensorPanel.class.getDeclaredMethod("setSensorActivity", Sensor.class, Boolean.class);
-                            method.setAccessible(true);
-                            method.invoke(new SensorPanel(), sensor,sensor.getActive());
-                            Method method1 = SensorPanel.class.getDeclaredMethod("updateSensorList", JPanel.class);
-                            method1.setAccessible(true);
-                            method1.invoke(new SensorPanel(), new JPanel());
+        } else if (armingStatus == ArmingStatus.ARMED_HOME && cats) {
+               setAlarmStatus(AlarmStatus.ALARM);
 
-                        } catch (InvocationTargetException e) {
-                            throw new RuntimeException(e);
-                        } catch (NoSuchMethodException e) {
-                            throw new RuntimeException(e);
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
+        }else if(ArmingStatus.ARMED_HOME==armingStatus || ArmingStatus.ARMED_AWAY==armingStatus){
+            Iterator<Sensor> sensorIterator = getSen().iterator();
+
+                while (sensorIterator.hasNext()){
+                    Sensor sensor1 = sensorIterator.next();
+                    sensor1.setActive(true);
+                    changeSensorActivationStatus(sensor1, false);
                         }
-                }
-                changeSensorActivationStatus(sensor,sensor.getActive());
-
         }
 
         securityRepository.setArmingStatus(armingStatus);
     }
+    private Set<Sensor> getSen(){
+        Set<Sensor> sensorSet = new HashSet<>();
+        sensorSet.addAll(securityRepository.getSensors());
+        return sensorSet;
 
+    }
 
     /**
      * Internal method that handles alarm status changes based on whether
@@ -86,11 +74,19 @@ public class SecurityService{
         cats = cat;
         if(cat && getArmingStatus() == ArmingStatus.ARMED_HOME) {
             setAlarmStatus(AlarmStatus.ALARM);
-        } else if(!cat) {
+        } else if(!cat && AllMatches()) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         }
 
         statusListeners.forEach(sl -> sl.catDetected(cat));
+    }
+
+    private Boolean AllMatches(){
+        if(getSen().containsAll(securityRepository.getSensors())){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     /**
@@ -118,6 +114,7 @@ public class SecurityService{
      * Internal method for updating the alarm status when a sensor has been activated.
      */
     private void handleSensorActivated() {
+        securityRepository.getAlarmStatus();
         if (securityRepository.getArmingStatus() == ArmingStatus.DISARMED) {
             return;
         }
@@ -135,14 +132,22 @@ public class SecurityService{
     /**
      * Internal method for updating the alarm status when a sensor has been deactivated
      */
-    private void handleSensorDeactivated() {
+    private void handleSensorDeactivated(Sensor sensor) {
+        if (securityRepository.getArmingStatus() == ArmingStatus.DISARMED) {
+            return;
+        }
        // if(securityRepository.getArmingStatus()==ArmingStatus.ARMED_AWAY || securityRepository.getArmingStatus()==ArmingStatus.ARMED_HOME) {
             switch (securityRepository.getAlarmStatus()) {
-                case PENDING_ALARM -> setAlarmStatus(AlarmStatus.NO_ALARM);
-                case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
+                case PENDING_ALARM -> {
+                    securityRepository.getSensors().remove(sensor);
+                    if (AllMatches()) {
+                        setAlarmStatus(AlarmStatus.NO_ALARM);
+                    }
+                }
+               // case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
                 default -> System.out.println("this is the default from handleSensorDeactivated");
-            }
-        //}
+        }
+
     }
 
     /**
@@ -151,17 +156,11 @@ public class SecurityService{
      * @param active
      */
     public void changeSensorActivationStatus(Sensor sensor, Boolean active) {
-        actived=active;
-        sensor = sensor;
-        if(!sensor.getActive() && active) {
+        if(active && !sensor.getActive()) {
             handleSensorActivated();
         } else if (sensor.getActive() && !active) {
-            handleSensorDeactivated();
-            if (AlarmStatus.PENDING_ALARM==(getAlarmStatus()) && sensor.getActive()) {
-                handleSensorDeactivated();
-            }
-        }else if (getArmingStatus()==(ArmingStatus.DISARMED) && AlarmStatus.ALARM==(getAlarmStatus())) {
-                handleSensorDeactivated();
+            handleSensorDeactivated(sensor);
+
         }
         sensor.setActive(active);
         securityRepository.updateSensor(sensor);

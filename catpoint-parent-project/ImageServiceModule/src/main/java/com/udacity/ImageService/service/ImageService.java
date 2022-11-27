@@ -1,4 +1,4 @@
-package com.udacity.ImageService.application;
+package com.udacity.ImageService.service;
 
 import java.awt.image.BufferedImage;
 

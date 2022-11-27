@@ -1,7 +1,5 @@
 package com.udacity.ImageService.service;
 
-import com.udacity.ImageService.application.ImageService;
-
 import java.awt.image.BufferedImage;
 import java.util.Random;
 

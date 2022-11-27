@@ -22,16 +22,13 @@ import java.util.stream.Collectors;
  */
 public class ControlPanel extends JPanel {
 
-    private SecurityService securityService;
-    private Map<ArmingStatus, JButton> buttonMap;
-
-    private SecurityRepository securityRepository = new PretendDatabaseSecurityRepositoryImpl();
-
+    private final SecurityService securityService;
+    private final Map<ArmingStatus, JButton> buttonMap;
 
     public ControlPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
-        this.securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
+        this.securityService = securityService;
 
         JLabel panelLabel = new JLabel("System Control");
         panelLabel.setFont(StyleService.HEADING_FONT);

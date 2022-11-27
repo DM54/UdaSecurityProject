@@ -1,11 +1,8 @@
 package com.udacity.SecurityService.application;
 
 import com.udacity.ImageService.service.FakeImageService;
-import com.udacity.SecurityService.data.ArmingStatus;
+import com.udacity.SecurityService.data.*;
 import com.udacity.SecurityService.service.StyleService;
-import com.udacity.SecurityService.data.PretendDatabaseSecurityRepositoryImpl;
-import com.udacity.SecurityService.data.SensorType;
-import com.udacity.SecurityService.data.Sensor;
 import com.udacity.SecurityService.service.SecurityService;
 import net.miginfocom.swing.MigLayout;
 
@@ -15,46 +12,24 @@ import javax.swing.*;
  * Panel that allows users to add sensors to their system. Sensors may be
  * manually set to "active" and "inactive" to test the system.
  */
-public class SensorPanel extends JPanel {
+public class SensorPanel extends JPanel implements StatusListener {
 
-    private SecurityService securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
+    private final SecurityService securityService;
 
-    private JLabel panelLabel = new JLabel("Sensor Management");
-    private JLabel newSensorName = new JLabel("Name:");
-    private JLabel newSensorType = new JLabel("Sensor Type:");
-    private JTextField newSensorNameField = new JTextField();
-    private JComboBox newSensorTypeDropdown = new JComboBox(SensorType.values());
-    private JButton addNewSensorButton = new JButton("Add New Sensor");
+    private final JLabel panelLabel = new JLabel("Sensor Management");
+    private final JLabel newSensorName = new JLabel("Name:");
+    private final JLabel newSensorType = new JLabel("Sensor Type:");
+    private final JTextField newSensorNameField = new JTextField();
+    private final JComboBox newSensorTypeDropdown = new JComboBox(SensorType.values());
+    private final JButton addNewSensorButton = new JButton("Add New Sensor");
 
-    private JPanel sensorListPanel = new JPanel();
-    private JPanel newSensorPanel = new JPanel();
-
-    public SensorPanel(){
-        super();
-        setLayout(new MigLayout());
-        this.securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
-
-        panelLabel.setFont(StyleService.HEADING_FONT);
-        addNewSensorButton.addActionListener(e ->
-                addSensor(new Sensor(newSensorNameField.getText(),
-                        SensorType.valueOf(newSensorTypeDropdown.getSelectedItem().toString()))));
-
-
-        newSensorPanel = buildAddSensorPanel();
-        sensorListPanel = new JPanel();
-        sensorListPanel.setLayout(new MigLayout());
-
-        updateSensorList(sensorListPanel);
-
-        add(panelLabel, "wrap");
-        add(newSensorPanel, "span");
-        add(sensorListPanel, "span");
-    }
+    private final JPanel sensorListPanel;
+    private final JPanel newSensorPanel;
 
     public SensorPanel(SecurityService securityService) {
         super();
         setLayout(new MigLayout());
-        this.securityService = new SecurityService(new PretendDatabaseSecurityRepositoryImpl(), new FakeImageService());
+        this.securityService = securityService;
 
         panelLabel.setFont(StyleService.HEADING_FONT);
         addNewSensorButton.addActionListener(e ->
@@ -150,6 +125,21 @@ public class SensorPanel extends JPanel {
     private void removeSensor(Sensor sensor) {
         securityService.removeSensor(sensor);
         updateSensorList(sensorListPanel);
+    }
+
+    @Override
+    public void notify(AlarmStatus status) {
+
+    }
+
+    @Override
+    public void catDetected(boolean catDetected) {
+
+    }
+
+    @Override
+    public void sensorStatusChanged() {
+     updateSensorList(sensorListPanel);
     }
 }
 

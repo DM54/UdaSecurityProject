@@ -7,7 +7,9 @@ import com.udacity.ImageService.service.FakeImageService;
 import com.udacity.SecurityService.application.SensorPanel;
 import com.udacity.SecurityService.service.SecurityService;
 
+import java.lang.reflect.Type;
 import java.util.*;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -31,6 +33,11 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
     private static final Gson gson = new Gson(); //used to serialize objects into JSON
     @SuppressWarnings("UnstableApiUsage")
     public PretendDatabaseSecurityRepositoryImpl(){
+        try{
+            prefs.clear();
+        }catch (BackingStoreException e){
+            throw new RuntimeException(e);
+        }
 
         //load system state from prefs, or else default
         alarmStatus = AlarmStatus.valueOf(prefs.get(ALARM_STATUS, AlarmStatus.NO_ALARM.toString()));
@@ -43,16 +50,9 @@ public class PretendDatabaseSecurityRepositoryImpl implements SecurityRepository
         if(sensorString == null) {
             sensors = new TreeSet<>();
         } else {
-
-            GsonBuilder gsonBuilder = new GsonBuilder();
-
-            EnumSet.allOf(SensorType.class).forEach(sensorType -> gsonBuilder.registerTypeAdapter(Sensor.class,
-                    new NewSensorProvider(SENSORS,sensorType)));
-
-                Gson gson1 = gsonBuilder.create();
-
-                sensors = gson1.fromJson(sensorString, new TypeToken<Set<Sensor>>() {
-                }.getType());
+            Type type = new TypeToken<Set<Sensor>>() {
+            }.getType();
+            sensors = gson.fromJson(sensorString, type);
 
         }
     }
