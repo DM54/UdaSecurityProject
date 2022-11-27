@@ -139,12 +139,12 @@ public class SecurityService{
        // if(securityRepository.getArmingStatus()==ArmingStatus.ARMED_AWAY || securityRepository.getArmingStatus()==ArmingStatus.ARMED_HOME) {
             switch (securityRepository.getAlarmStatus()) {
                 case PENDING_ALARM -> {
-                    securityRepository.getSensors().remove(sensor);
+
                     if (AllMatches()) {
                         setAlarmStatus(AlarmStatus.NO_ALARM);
                     }
                 }
-               // case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
+                case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
                 default -> System.out.println("this is the default from handleSensorDeactivated");
         }
 
