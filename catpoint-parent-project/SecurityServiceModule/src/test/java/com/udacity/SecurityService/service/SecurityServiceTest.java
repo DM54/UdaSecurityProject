@@ -20,10 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.powermock.reflect.Whitebox;
 
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.udacity.SecurityService.data.AlarmStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,17 +53,18 @@ public class SecurityServiceTest {
    public void If_alarm_isArmed_andSensor_becomesActivated_put_theSystem_intoPendingAlarmStatus() throws Exception {
 
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
-        securityService.addSensor(sensor);
+        when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
+       // securityService.addSensor(sensor);
        // if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
-            securityService.changeSensorActivationStatus(sensor, false);
+            securityService.changeSensorActivationStatus(sensor, true);
            // Whitebox.invokeMethod(securityService,  "handleSensorActivated");
-            when(securityRepository.getAlarmStatus()).thenReturn(NO_ALARM);
-           if (securityRepository.getAlarmStatus().equals(NO_ALARM)) {
-                securityRepository.setAlarmStatus(PENDING_ALARM);
+
+          // if (securityRepository.getAlarmStatus().equals(NO_ALARM)) {
+              //  securityRepository.setAlarmStatus(PENDING_ALARM);
                 assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
                // assertEquals(PENDING_ALARM, securityRepository.getAlarmStatus());
                 verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.PENDING_ALARM);
-           }
+           //}
       //  }
 
     }
@@ -153,16 +151,35 @@ public class SecurityServiceTest {
     @Test
     public void IfSensor_deactivated_alreadyInactive_makeNoChanges_toTheAlarmState() throws Exception {
         when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
-       if (securityRepository.getAlarmStatus().equals(ALARM)) {
+      if (securityRepository.getAlarmStatus().equals(ALARM)) {
+           sensor.setActive(false);
+           securityService.changeSensorActivationStatus(sensor, false);
+          // securityRepository.setAlarmStatus(PENDING_ALARM);
+       }
+        //when(sensor.getActive()).thenReturn(false);
+       // securityService.changeSensorActivationStatus(sensor, false);
+        Whitebox.invokeMethod(securityService,"handleSensorDeactivated");
+        assertEquals(false,sensor.getActive());
+        assertEquals(ALARM, securityRepository.getAlarmStatus());
+
+      // verify(securityRepository, never()).setAlarmStatus(any(AlarmStatus.class));
+
+    }
+    @Test
+    public void Sensor_deactivated_alreadyInactive() throws Exception {
+        when(securityRepository.getAlarmStatus()).thenReturn(PENDING_ALARM);
+        if (securityRepository.getAlarmStatus().equals(PENDING_ALARM)) {
             sensor.setActive(false);
             securityService.changeSensorActivationStatus(sensor, false);
-            // when(s.getActive()).thenReturn(false);
-           // Whitebox.invokeMethod
-                 //   (securityService, "handleSensorDeactivated");
-            assertEquals(ALARM, securityRepository.getAlarmStatus());
-            verify(securityRepository, never()).setAlarmStatus(any(AlarmStatus.class));
-
+            // securityRepository.setAlarmStatus(PENDING_ALARM);
         }
+        when(sensor.getActive()).thenReturn(false);
+         securityService.changeSensorActivationStatus(sensor, false);
+        Whitebox.invokeMethod(securityService,"handleSensorDeactivated");
+        assertEquals(false,sensor.getActive());
+        assertEquals(PENDING_ALARM, securityRepository.getAlarmStatus());
+
+        //verify(securityRepository, never()).setAlarmStatus(any(AlarmStatus.class));
 
     }
 
@@ -200,9 +217,9 @@ public class SecurityServiceTest {
     @ParameterizedTest
     @DisplayName("ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach")
     @ValueSource(strings = {"DISARMED", "ARMED_HOME", "ARMED_AWAY"})
-    public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach(String args) throws Exception {
+    public void ifSystem_DisarmedOrArmedOrARMEDHome_returnTheValueForEach(String args) {
         assertNotNull(args);
-        BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
+
         when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.valueOf(args));
        // when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
         if (securityRepository.getArmingStatus().equals(ArmingStatus.DISARMED)) {
@@ -214,30 +231,51 @@ public class SecurityServiceTest {
             securityService.setArmingStatus(ArmingStatus.DISARMED);
         }
 
-     else if(securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_AWAY) ||
-              securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
-          securityRepository.getSensors().forEach((k2) -> {
-              k2.setActive(false);
-              securityService.changeSensorActivationStatus(k2, !k2.getActive());
-              assertEquals(k2.getActive(), false);
-              assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
-              assertEquals(ArmingStatus.ARMED_AWAY,securityRepository.getArmingStatus());
-          });
-          securityService.setArmingStatus(ArmingStatus.ARMED_HOME);
-          securityService.setArmingStatus(ArmingStatus.ARMED_AWAY);
-   }
+     else if(securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_AWAY)
+             ) {
+            if (securityRepository.getSensors().containsAll(securityService.getSen())) {
+                Iterator<Sensor> sensorIterator = securityService.getSen().iterator();
 
-  else if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
-        Whitebox.invokeMethod(securityService, "catDetected", true);
-        when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
-        securityService.processImage(bufferedImage);
+                while (sensorIterator.hasNext()) {
+                    Sensor sensor1 = sensorIterator.next();
+                    sensor1.setActive(true);
+                    securityService.changeSensorActivationStatus(sensor1, false);
+                }
+                // assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
+                assertEquals(ArmingStatus.ARMED_AWAY, securityRepository.getArmingStatus());
+            }
+        } else if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
+            if (securityRepository.getSensors().containsAll(securityService.getSen())) {
+                Iterator<Sensor> sensorIterator = securityService.getSen().iterator();
+
+                while (sensorIterator.hasNext()) {
+                    Sensor sensor1 = sensorIterator.next();
+                    sensor1.setActive(true);
+                    securityService.changeSensorActivationStatus(sensor1, false);
+                }
+                // assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
+                assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
+            }
+        }
+
+    }
+
+    @Test
+    public void IftheSystem_armedhome_theCameraAcat_setAlarmStatusToAlarm() throws Exception {
+        BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
         when(securityRepository.getAlarmStatus()).thenReturn(ALARM);
-      //  if (securityRepository.getAlarmStatus().equals(ALARM)) {
+       if (securityRepository.getArmingStatus().equals(ArmingStatus.ARMED_HOME)) {
+            Whitebox.invokeMethod(securityService, "catDetected", true);
+            when(imageService.imageContainsCat(bufferedImage, 50.0f)).thenReturn(true);
+            securityService.processImage(bufferedImage);
+
+            //  if (securityRepository.getAlarmStatus().equals(ALARM)) {
             assertEquals(ALARM, securityRepository.getAlarmStatus());
             assertEquals(ArmingStatus.ARMED_HOME, securityRepository.getArmingStatus());
-            securityService.setAlarmStatus(ALARM);
+            //securityService.setAlarmStatus(ALARM);
+        }
     }
 
-    }
 }
 

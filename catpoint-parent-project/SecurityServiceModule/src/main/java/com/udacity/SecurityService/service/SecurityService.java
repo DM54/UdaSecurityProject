@@ -55,7 +55,7 @@ public class SecurityService{
         }
         securityRepository.setArmingStatus(armingStatus);
     }
-    private Set<Sensor> getSen(){
+    public Set<Sensor> getSen(){
         Set<Sensor> sensorSet = new HashSet<>();
         sensorSet.addAll(securityRepository.getSensors());
         return sensorSet;
@@ -121,21 +121,17 @@ public class SecurityService{
             return;
         }
             switch (securityRepository.getAlarmStatus()) {
-                case PENDING_ALARM ->
-                        setAlarmStatus(AlarmStatus.NO_ALARM);
+                case PENDING_ALARM -> setAlarmStatus(AlarmStatus.NO_ALARM);
                 case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
-                default -> System.out.println("this is the default from handleSensorDeactivated");}}
-
+                default ->{}}}
     /**
      * Change the activation status for the specified sensor and update alarm status if necessary.
      * @param sensor
      * @param active
      */
     public void changeSensorActivationStatus(Sensor sensor, Boolean active) {
-        if(active && !sensor.getActive()) {
-            handleSensorActivated();
-        } else if (sensor.getActive() && !active) {
-            handleSensorDeactivated();}
+        if(active && !sensor.getActive()) {handleSensorActivated();}
+        if (sensor.getActive() && !active) {handleSensorDeactivated();}
         sensor.setActive(active);
         securityRepository.updateSensor(sensor);}
     /**
@@ -153,11 +149,9 @@ public class SecurityService{
         return securityRepository.getSensors();
     }
 
-    public void addSensor(Sensor sensor) {
-        securityRepository.addSensor(sensor);}
+    public void addSensor(Sensor sensor) {securityRepository.addSensor(sensor);}
 
-    public void removeSensor(Sensor sensor) {
-        securityRepository.removeSensor(sensor);}
+    public void removeSensor(Sensor sensor) {securityRepository.removeSensor(sensor);}
 
     public ArmingStatus getArmingStatus() {
         return securityRepository.getArmingStatus();
