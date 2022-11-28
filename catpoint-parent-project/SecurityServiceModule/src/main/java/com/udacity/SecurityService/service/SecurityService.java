@@ -113,16 +113,19 @@ public class SecurityService{
                 case PENDING_ALARM -> setAlarmStatus(AlarmStatus.ALARM);
                 default -> System.out.println("this is the default from handleSensorActivated");}}
 
-    /**
-     * Internal method for updating the alarm status when a sensor has been deactivated
-     */
+
+
+
+      /**
+       * Internal method for updating the alarm status when a sensor has been deactivated
+       */
     private void handleSensorDeactivated() {
         if (securityRepository.getArmingStatus() == ArmingStatus.DISARMED) {
             return;
         }
             switch (securityRepository.getAlarmStatus()) {
-                case PENDING_ALARM -> setAlarmStatus(AlarmStatus.NO_ALARM);
-                case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
+                case PENDING_ALARM ->setAlarmStatus(AlarmStatus.NO_ALARM);
+                //case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
                 default ->{}}}
     /**
      * Change the activation status for the specified sensor and update alarm status if necessary.
